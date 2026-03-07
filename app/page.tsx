@@ -161,7 +161,7 @@ export default function Home() {
       {/* ── Ticker ──────────────────────────────────────────────────── */}
       <div className="bg-saffron-600/50 backdrop-blur text-white py-2 text-[10px] sm:text-xs font-bold uppercase tracking-[0.2em] text-center border-y border-white/10 overflow-hidden whitespace-nowrap">
         <div className="animate-marquee inline-block">
-          Professional Cricket Auction Experience &nbsp;•&nbsp; શ્રેષ્ઠ ક્રિકેટ ઓક્શન અનુભવ &nbsp;•&nbsp; {settings.auctionTitle || 'Cricket Auction 2026'} &nbsp;•&nbsp; {stats.total} Players Registered &nbsp;•&nbsp; {stats.sold} Players Sold &nbsp;•&nbsp; {tournaments.length} Tournaments Registered &nbsp;•&nbsp; Login to participate in Live Auction &nbsp;•&nbsp; playerauctionhub.in &nbsp;•&nbsp; 🏆
+          Professional Cricket Auction Platform &nbsp;•&nbsp; પ્રોફેશનલ ઓક્શન પ્લેટફોર્મ &nbsp;•&nbsp; {settings.auctionTitle || 'Cricket Auction 2026'} &nbsp;•&nbsp; {stats.total} Players Registered &nbsp;•&nbsp; {stats.sold} Players Sold &nbsp;•&nbsp; {tournaments.length} Tournaments Registered &nbsp;•&nbsp; Login to participate in Live Auction &nbsp;•&nbsp; playerauctionhub.in &nbsp;•&nbsp; 🏆
         </div>
       </div>
 
