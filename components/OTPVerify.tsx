@@ -4,11 +4,13 @@ import { RecaptchaVerifier, signInWithPhoneNumber, ConfirmationResult } from 'fi
 import { auth } from '@/lib/firebase'
 
 interface OTPVerifyProps {
-  phoneNumber: string           // e.g. "9876543210"
-  onVerified: () => void        // called when OTP verified successfully
-  onCancel?: () => void         // optional cancel button
-  countryCode?: string          // default "+91"
+  phoneNumber: string
+  onVerified: () => void
+  onCancel?: () => void
+  countryCode?: string
 }
+
+let globalRecaptcha: RecaptchaVerifier | null = null
 
 export default function OTPVerify({ phoneNumber, onVerified, onCancel, countryCode = '+91' }: OTPVerifyProps) {
   const [step, setStep] = useState<'send' | 'verify'>('send')
@@ -17,45 +19,51 @@ export default function OTPVerify({ phoneNumber, onVerified, onCancel, countryCo
   const [error, setError] = useState('')
   const [timer, setTimer] = useState(0)
   const confirmRef = useRef<ConfirmationResult | null>(null)
-  const recaptchaRef = useRef<RecaptchaVerifier | null>(null)
 
-  // Countdown timer for resend
   useEffect(() => {
     if (timer <= 0) return
     const iv = setInterval(() => setTimer(t => t - 1), 1000)
     return () => clearInterval(iv)
   }, [timer])
 
-  const setupRecaptcha = () => {
-    if (recaptchaRef.current) return
-    recaptchaRef.current = new RecaptchaVerifier(auth, 'recaptcha-container', {
-      size: 'invisible',
-      callback: () => {},
-    })
+  // Cleanup recaptcha on unmount
+  useEffect(() => {
+    return () => {
+      if (globalRecaptcha) {
+        try { globalRecaptcha.clear() } catch {}
+        globalRecaptcha = null
+      }
+    }
+  }, [])
+
+  const getRecaptcha = () => {
+    if (globalRecaptcha) {
+      try { globalRecaptcha.clear() } catch {}
+      globalRecaptcha = null
+    }
+    // Remove old recaptcha container contents
+    const container = document.getElementById('recaptcha-otp')
+    if (container) container.innerHTML = ''
+
+    globalRecaptcha = new RecaptchaVerifier(auth, 'recaptcha-otp', { size: 'invisible' })
+    return globalRecaptcha
   }
 
   const sendOTP = async () => {
-    if (!phoneNumber || phoneNumber.length < 10) {
-      setError('Enter valid 10-digit phone number first')
-      return
-    }
+    if (!phoneNumber || phoneNumber.length < 10) { setError('Enter valid 10-digit phone number'); return }
     setLoading(true)
     setError('')
     try {
-      setupRecaptcha()
+      const recaptcha = getRecaptcha()
       const fullNumber = `${countryCode}${phoneNumber.replace(/\D/g, '').slice(-10)}`
-      const result = await signInWithPhoneNumber(auth, fullNumber, recaptchaRef.current!)
+      const result = await signInWithPhoneNumber(auth, fullNumber, recaptcha)
       confirmRef.current = result
       setStep('verify')
-      setTimer(60) // 60 sec resend cooldown
+      setTimer(60)
     } catch (e: any) {
-      if (e.code === 'auth/too-many-requests') {
-        setError('Too many OTP requests. Wait and try again.')
-      } else if (e.code === 'auth/invalid-phone-number') {
-        setError('Invalid phone number. Use format: 9876543210')
-      } else {
-        setError(e.message || 'Failed to send OTP')
-      }
+      if (e.code === 'auth/too-many-requests') setError('Too many requests. Wait and try again.')
+      else if (e.code === 'auth/invalid-phone-number') setError('Invalid phone number.')
+      else setError(e.message || 'Failed to send OTP')
     }
     setLoading(false)
   }
@@ -76,7 +84,7 @@ export default function OTPVerify({ phoneNumber, onVerified, onCancel, countryCo
 
   return (
     <div className="space-y-3">
-      <div id="recaptcha-container" />
+      <div id="recaptcha-otp" />
 
       {step === 'send' ? (
         <>
@@ -84,8 +92,7 @@ export default function OTPVerify({ phoneNumber, onVerified, onCancel, countryCo
             <p className="text-sm text-blue-700 font-semibold">📱 Phone Verification Required</p>
             <p className="text-xs text-blue-500 mt-1">OTP will be sent to <strong>{countryCode} {phoneNumber}</strong></p>
           </div>
-          <button onClick={sendOTP} disabled={loading}
-            className="btn-primary w-full py-3 gap-2">
+          <button onClick={sendOTP} disabled={loading} className="btn-primary w-full py-3 gap-2">
             {loading ? '⏳ Sending OTP…' : '📲 Send OTP'}
           </button>
         </>
@@ -95,14 +102,10 @@ export default function OTPVerify({ phoneNumber, onVerified, onCancel, countryCo
             <p className="text-sm text-green-700 font-semibold">✅ OTP Sent!</p>
             <p className="text-xs text-green-500 mt-1">Enter the 6-digit OTP sent to {countryCode} {phoneNumber}</p>
           </div>
-          <input
-            className="input text-center text-2xl tracking-[0.5em] font-bold"
+          <input className="input text-center text-2xl tracking-[0.5em] font-bold"
             type="text" maxLength={6} placeholder="● ● ● ● ● ●"
-            value={otp} onChange={e => setOtp(e.target.value.replace(/\D/g, ''))}
-            autoFocus
-          />
-          <button onClick={verifyOTP} disabled={loading || otp.length !== 6}
-            className="btn-primary w-full py-3 gap-2">
+            value={otp} onChange={e => setOtp(e.target.value.replace(/\D/g, ''))} autoFocus/>
+          <button onClick={verifyOTP} disabled={loading || otp.length !== 6} className="btn-primary w-full py-3 gap-2">
             {loading ? '⏳ Verifying…' : '✅ Verify OTP'}
           </button>
           <div className="flex items-center justify-between text-xs">
@@ -110,9 +113,7 @@ export default function OTPVerify({ phoneNumber, onVerified, onCancel, countryCo
               className="text-saffron-600 font-bold hover:underline disabled:text-stone-300">
               {timer > 0 ? `Resend in ${timer}s` : '🔄 Resend OTP'}
             </button>
-            {onCancel && (
-              <button onClick={onCancel} className="text-stone-400 hover:text-stone-600">Cancel</button>
-            )}
+            {onCancel && <button onClick={onCancel} className="text-stone-400 hover:text-stone-600">Cancel</button>}
           </div>
         </>
       )}

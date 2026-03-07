@@ -76,6 +76,9 @@ export default function LoginPage() {
     if (!phone || phone.length < 10) { toast.error('Enter valid 10-digit phone number'); return }
     setLoading(true)
     try {
+      // Clear old recaptcha
+      const container = document.getElementById('recaptcha-login')
+      if (container) container.innerHTML = ''
       const recaptcha = new RecaptchaVerifier(auth, 'recaptcha-login', { size: 'invisible' })
       const fullNumber = `+91${phone.replace(/\D/g, '').slice(-10)}`
       const result = await signInWithPhoneNumber(auth, fullNumber, recaptcha)
