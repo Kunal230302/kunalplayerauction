@@ -199,7 +199,7 @@ export default function Home() {
             <h2 className="text-3xl font-extrabold text-stone-800 mb-2">How the Auction Works</h2>
             <p className="text-stone-400 text-sm">Simple step-by-step process</p>
           </div>
-          <div className="grid sm:grid-cols-3 gap-5 mb-16">
+          <div className="grid sm:grid-cols-3 gap-5">
             {[
               { n:'01', e:'📋', t:'Admin Puts Player', d:'Tournament admin calls each player for auction. Player photo, name and role shows on all screens.' },
               { n:'02', e:<img src="/icon.png" className="w-6 h-6 object-contain inline-block" />, t:'Teams Bid Points',  d:'4 teams click their bid buttons. Points increase with each bid. Highest bidder leads the auction.' },
@@ -214,18 +214,6 @@ export default function Home() {
             ))}
           </div>
 
-          {/* New Feature Image Section */}
-          <div className="relative rounded-3xl overflow-hidden shadow-2xl border-4 border-white">
-            <img src="/auction-feature.jpg" alt="Auction Experience" className="w-full h-auto object-cover" />
-            <div className="absolute inset-0 bg-gradient-to-t from-stone-900/80 via-transparent to-transparent flex items-end">
-              <div className="p-8 text-white">
-                <h3 className="text-2xl font-black mb-2 drop-shadow-lg">Experience the Live Auction</h3>
-                <p className="text-stone-100 text-sm font-medium max-w-xl drop-shadow-md">
-                  Our dedicated cricket auction interface provides real-time updates, professional graphics, and a seamless bidding experience for your tournament.
-                </p>
-              </div>
-            </div>
-          </div>
         </div>
       </section>
 
