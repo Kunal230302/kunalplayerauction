@@ -4,7 +4,7 @@ import { AuthProvider } from '@/lib/auth'
 import { Toaster } from 'react-hot-toast'
 
 export const metadata: Metadata = {
-  title: 'PlayerAuctionHub – Local Cricket Auction',
+  title: 'PlayerAuctionHub – Professional Cricket Auction Platform',
   description: 'Live cricket player auction platform for local tournaments. playerauctionhub.in',
   icons: {
     icon: '/icon.png',

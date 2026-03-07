@@ -159,13 +159,10 @@ export default function Home() {
       </section>
 
       {/* ── Ticker ──────────────────────────────────────────────────── */}
-      <div className="ticker-wrap py-2 overflow-hidden">
-        <span className="ticker-text px-8">
-          🏏 Welcome to PlayerAuctionHub &nbsp;•&nbsp; {settings.auctionTitle || 'Cricket Auction 2026'} &nbsp;•&nbsp;
-          {stats.total} Players Registered &nbsp;•&nbsp; {stats.sold} Players Sold &nbsp;•&nbsp;
-          {tournaments.length} Tournaments Registered &nbsp;•&nbsp;
-          Login to participate in Live Auction &nbsp;•&nbsp; playerauctionhub.in &nbsp;•&nbsp; 🏆
-        </span>
+      <div className="bg-saffron-600/50 backdrop-blur text-white py-2 text-[10px] sm:text-xs font-bold uppercase tracking-[0.2em] text-center border-y border-white/10 overflow-hidden whitespace-nowrap">
+        <div className="animate-marquee inline-block">
+          Professional Cricket Auction Experience &nbsp;•&nbsp; શ્રેષ્ઠ ક્રિકેટ ઓક્શન અનુભવ &nbsp;•&nbsp; {settings.auctionTitle || 'Cricket Auction 2026'} &nbsp;•&nbsp; {stats.total} Players Registered &nbsp;•&nbsp; {stats.sold} Players Sold &nbsp;•&nbsp; {tournaments.length} Tournaments Registered &nbsp;•&nbsp; Login to participate in Live Auction &nbsp;•&nbsp; playerauctionhub.in &nbsp;•&nbsp; 🏆
+        </div>
       </div>
 
       {/* ── Stats strip ─────────────────────────────────────────────── */}
@@ -341,13 +338,18 @@ export default function Home() {
       {/* ── Footer ─────────────────────────────────────────────────── */}
       <footer className="bg-stone-900 text-stone-400 py-10 px-4">
         <div className="max-w-4xl mx-auto text-center">
-          <div className="flex items-center justify-center gap-2 mb-2">
-            <span className="text-2xl">🏏</span>
-            <span className="font-extrabold text-white text-lg">PlayerAuctionHub</span>
+          <div className="flex items-center justify-center gap-3 mb-4">
+            <div className="w-10 h-10 rounded-xl overflow-hidden shadow-sm">
+              <img src="/icon.png" alt="Logo" className="w-full h-full object-contain" />
+            </div>
+            <span className="font-extrabold text-white text-xl tracking-tight">PlayerAuctionHub</span>
           </div>
-          <p className="text-sm mb-1">playerauctionhub.in — Local Cricket Auction Platform</p>
+          <p className="text-sm mb-1 font-bold">playerauctionhub.in</p>
+          <p className="text-xs text-stone-500 mb-4 tracking-wide uppercase">
+            Professional Auction Platform | પ્રોફેશનલ ઓક્શન પ્લેટફોર્મ
+          </p>
           <p className="text-sm font-semibold">
-            Made with 🏏 by{' '}
+            Made with <img src="/icon.png" className="w-4 h-4 inline-block mx-0.5" alt="🏏" /> by{' '}
             <span className="text-saffron-400">Kunal Kotak</span> &amp;{' '}
             <span className="text-blue-400">Yash Jani</span>
           </p>

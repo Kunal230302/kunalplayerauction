@@ -95,8 +95,8 @@ export default function OverlayPage() {
         <div style={{ color:'#FFD700', fontSize:'22px', fontWeight:900, letterSpacing:'2px', textTransform:'uppercase', textShadow:'0 0 20px rgba(255,215,0,0.5)' }}>
           🏆 Player Auction Hub
         </div>
-        <div style={{ color:'rgba(255,255,255,0.7)', fontSize:'13px', letterSpacing:'3px', textTransform:'uppercase' }}>
-          LIVE AUCTION
+        <div style={{ color:'rgba(255,255,255,0.7)', fontSize:'12px', letterSpacing:'1px', textTransform:'uppercase', fontWeight:700 }}>
+          LIVE AUCTION | શ્રેષ્ઠ ક્રિકેટ ઓક્શન અનુભવ
         </div>
       </div>
 

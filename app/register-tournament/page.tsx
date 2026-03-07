@@ -228,8 +228,10 @@ export default function RegisterTournament() {
         <div className="flex items-center gap-3 mb-6 pt-4">
           <Link href="/" className="p-2 rounded-lg hover:bg-saffron-100 text-stone-400 transition"><FiArrowLeft size={20}/></Link>
           <div>
-            <h1 className="text-2xl font-extrabold text-stone-800">Register Tournament</h1>
-            <p className="text-stone-400 text-sm">Create your local cricket auction tournament</p>
+            <h1 className="text-3xl font-black text-stone-800 mb-2 tracking-tight">Register Your Tournament</h1>
+            <p className="text-stone-500 font-medium italic">
+              Professional Cricket Auction Platform | પ્રોફેશનલ ઓક્શન પ્લેટફોર્મ
+            </p>
           </div>
         </div>
 

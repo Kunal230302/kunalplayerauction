@@ -62,8 +62,8 @@ export default function YouTubeOverlay() {
           <span style={{ color: 'white', fontSize: '16px', fontWeight: 900, letterSpacing: '1px' }}>
             PLAYERAUCTIONHUB
           </span>
-          <span style={{ color: 'rgba(255,255,255,0.6)', fontSize: '12px', fontWeight: 600, marginLeft: '8px' }}>
-            LOCAL CRICKET AUCTION
+          <span style={{ color: 'rgba(255,255,255,0.7)', fontSize: '11px', fontWeight: 700, marginLeft: '8px', letterSpacing: '0.5px' }}>
+            PROFESSIONAL AUCTION EXPERIENCE | શ્રેષ્ઠ ક્રિકેટ ઓક્શન અનુભવ
           </span>
           <div style={{ flex: 1 }} />
           <div style={{
