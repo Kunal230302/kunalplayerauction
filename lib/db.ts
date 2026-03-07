@@ -14,6 +14,7 @@ export interface Tournament {
   ballType: string; groundName: string; groundLocation: string
   auctionLocation: string; status: 'upcoming' | 'live' | 'ended'
   code: string; createdBy: string; isAdmin: boolean; maxFreeTeams: number
+  auctionTitle?: string; auctionDate?: string
 }
 export interface Player {
   id: string; name: string; surname: string; village: string; role: string
