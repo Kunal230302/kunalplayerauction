@@ -6,6 +6,9 @@ import { Toaster } from 'react-hot-toast'
 export const metadata: Metadata = {
   title: 'PlayerAuctionHub – Local Cricket Auction',
   description: 'Live cricket player auction platform for local tournaments. playerauctionhub.in',
+  icons: {
+    icon: '/icon.png',
+  },
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
