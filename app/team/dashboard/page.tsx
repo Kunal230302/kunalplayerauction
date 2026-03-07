@@ -106,7 +106,9 @@ export default function TeamDashboard() {
       <header className="bg-white border-b-2 border-saffron-100 shadow-sm sticky top-0 z-50">
         <div className="max-w-5xl mx-auto px-4 h-14 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 bg-saffron-500 rounded-xl flex items-center justify-center text-white font-extrabold">🏏</div>
+            <div className="w-9 h-9 rounded-xl flex items-center justify-center overflow-hidden shadow-sm">
+              <img src="/icon.png" alt="Logo" className="w-full h-full object-contain" />
+            </div>
             <div>
               <div className="font-extrabold text-saffron-600 text-sm leading-none">PlayerAuctionHub</div>
               <div className="text-[10px] text-stone-400">{myTeam?.teamName || appUser?.displayName}</div>
@@ -296,7 +298,7 @@ export default function TeamDashboard() {
 
         {/* Footer credits */}
         <div className="text-center py-4 text-stone-400 text-xs">
-          <p>Made with 🏏 by <span className="text-saffron-500 font-bold">Kunal Kotak</span> &amp; <span className="text-blue-500 font-bold">Yash Jani</span></p>
+          <p>Made with <img src="/icon.png" className="w-4 h-4 inline-block mx-0.5" alt="🏏" /> by <span className="text-saffron-500 font-bold">Kunal Kotak</span> &amp; <span className="text-blue-500 font-bold">Yash Jani</span></p>
           <div className="flex items-center justify-center gap-4 mt-1">
             <a href="https://instagram.com/kunallll2303" target="_blank" className="flex items-center gap-1 hover:text-saffron-500 transition-colors"><FiInstagram size={11}/> @kunallll2303</a>
             <a href="https://instagram.com/yash_jani_" target="_blank" className="flex items-center gap-1 hover:text-blue-500 transition-colors"><FiInstagram size={11}/> @yash_jani_</a>

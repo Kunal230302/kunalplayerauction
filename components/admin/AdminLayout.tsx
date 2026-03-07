@@ -25,7 +25,9 @@ function Sidebar({ close }: { close?: () => void }) {
       {/* Logo */}
       <div className="px-5 py-4 border-b-2 border-saffron-100 flex items-center justify-between">
         <Link href="/" className="flex items-center gap-2.5">
-          <div className="w-9 h-9 bg-saffron-500 rounded-xl flex items-center justify-center text-white font-extrabold text-base">🏏</div>
+          <div className="w-9 h-9 rounded-xl flex items-center justify-center overflow-hidden shadow-sm">
+            <img src="/icon.png" alt="Logo" className="w-full h-full object-contain" />
+          </div>
           <div>
             <div className="font-extrabold text-saffron-600 text-xs leading-none">PlayerAuctionHub</div>
             <div className="text-[10px] text-stone-400 font-medium mt-0.5">Admin Panel</div>
@@ -113,7 +115,9 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
     return (
       <div className="flex items-center justify-center h-screen bg-stone-50">
         <div className="text-center">
-          <div className="w-12 h-12 bg-saffron-500 rounded-2xl flex items-center justify-center text-white text-2xl mx-auto mb-3 animate-pulse">🏏</div>
+          <div className="w-12 h-12 rounded-2xl flex items-center justify-center overflow-hidden mx-auto mb-3 animate-pulse">
+            <img src="/icon.png" alt="Logo" className="w-full h-full object-contain" />
+          </div>
           <div className="text-stone-400 text-sm font-semibold">Loading…</div>
         </div>
       </div>

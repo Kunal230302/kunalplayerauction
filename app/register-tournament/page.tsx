@@ -99,7 +99,12 @@ export default function RegisterTournament() {
   // Loading
   if (authLoading) return (
     <div className="min-h-screen flex items-center justify-center bg-stone-50">
-      <div className="text-5xl animate-bounce">🏏</div>
+      <div className="text-center">
+        <div className="w-16 h-16 rounded-3xl flex items-center justify-center overflow-hidden mx-auto mb-3 animate-bounce">
+          <img src="/icon.png" alt="Logo" className="w-full h-full object-contain" />
+        </div>
+        <p className="text-stone-400 font-medium">Loading…</p>
+      </div>
     </div>
   )
 

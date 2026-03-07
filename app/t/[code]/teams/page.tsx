@@ -63,7 +63,16 @@ export default function TournamentTeamsPage() {
     setSaving(false)
   }
 
-  if (loading) return <div className="min-h-screen flex items-center justify-center bg-stone-50"><div className="text-5xl animate-bounce">🏏</div></div>
+  if (loading) return (
+    <div className="min-h-screen flex items-center justify-center bg-stone-50">
+      <div className="text-center">
+        <div className="w-16 h-16 rounded-3xl flex items-center justify-center overflow-hidden mx-auto mb-3 animate-bounce">
+          <img src="/icon.png" alt="Logo" className="w-full h-full object-contain" />
+        </div>
+        <p className="text-stone-400 font-medium">Loading…</p>
+      </div>
+    </div>
+  )
   if (notFound) return (
     <div className="min-h-screen flex items-center justify-center bg-stone-50 p-4 text-center">
       <div><div className="text-6xl mb-4">😕</div><h1 className="text-2xl font-extrabold mb-2">Tournament Not Found</h1>

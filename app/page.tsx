@@ -93,7 +93,9 @@ export default function Home() {
       <header className="fixed top-0 left-0 right-0 z-50 bg-white/90 backdrop-blur-md border-b-2 border-saffron-100 shadow-sm">
         <div className="max-w-5xl mx-auto h-14 px-4 flex items-center justify-between">
           <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 bg-saffron-500 rounded-lg flex items-center justify-center text-white font-extrabold text-base leading-none">🏏</div>
+            <div className="w-8 h-8 rounded-lg flex items-center justify-center overflow-hidden">
+              <img src="/icon.png" alt="Logo" className="w-full h-full object-contain" />
+            </div>
             <div>
               <div className="font-extrabold text-saffron-600 text-sm leading-none tracking-tight">PlayerAuctionHub</div>
               <div className="text-[10px] text-stone-400 font-medium">playerauctionhub.in</div>
@@ -191,7 +193,7 @@ export default function Home() {
           <div className="grid sm:grid-cols-3 gap-5">
             {[
               { n:'01', e:'📋', t:'Admin Puts Player', d:'Tournament admin calls each player for auction. Player photo, name and role shows on all screens.' },
-              { n:'02', e:'🏏', t:'Teams Bid Points',  d:'4 teams click their bid buttons. Points increase with each bid. Highest bidder leads the auction.' },
+              { n:'02', e:<img src="/icon.png" className="w-6 h-6 object-contain inline-block" />, t:'Teams Bid Points',  d:'4 teams click their bid buttons. Points increase with each bid. Highest bidder leads the auction.' },
               { n:'03', e:'🏆', t:'SOLD! Celebrate!',  d:'Timer ends. Player is SOLD to the highest bidding team. Confetti celebration! PDF report generated.' },
             ].map(s => (
               <div key={s.n} className="bg-saffron-50 border-2 border-saffron-100 rounded-2xl p-6 text-center">

@@ -24,7 +24,9 @@ export default function LoginPage() {
       <div className="min-h-screen flex items-center justify-center p-4"
         style={{ background: 'linear-gradient(135deg, #fff7ed 0%, #ffedd5 40%, #fff 100%)' }}>
         <div className="relative w-full max-w-md text-center">
-          <div className="w-16 h-16 bg-saffron-500 rounded-3xl flex items-center justify-center text-white text-3xl shadow-xl shadow-saffron-200 mx-auto mb-4">🏏</div>
+          <div className="w-16 h-16 rounded-3xl flex items-center justify-center overflow-hidden shadow-xl shadow-saffron-200 mx-auto mb-4">
+            <img src="/icon.png" alt="Logo" className="w-full h-full object-contain" />
+          </div>
           <h1 className="font-extrabold text-2xl text-stone-800 mb-1">Welcome Back!</h1>
           <p className="text-stone-400 text-sm mb-6">Logged in as <strong className="text-stone-700">{appUser.displayName}</strong> ({appUser.role === 'admin' ? '👑 Admin' : '🏏 Team Owner'})</p>
           <div className="card p-6 shadow-2xl border-2 border-saffron-100 space-y-3">
@@ -74,7 +76,9 @@ export default function LoginPage() {
         {/* Logo */}
         <div className="text-center mb-8">
           <Link href="/" className="inline-flex flex-col items-center gap-2">
-            <div className="w-16 h-16 bg-saffron-500 rounded-3xl flex items-center justify-center text-white text-3xl shadow-xl shadow-saffron-200">🏏</div>
+            <div className="w-16 h-16 rounded-3xl flex items-center justify-center overflow-hidden shadow-xl shadow-saffron-200">
+              <img src="/icon.png" alt="Logo" className="w-full h-full object-contain" />
+            </div>
             <div>
               <div className="font-extrabold text-saffron-600 text-xl leading-none">PlayerAuctionHub</div>
               <div className="text-xs text-stone-400 font-medium mt-0.5">playerauctionhub.in</div>
@@ -148,7 +152,7 @@ export default function LoginPage() {
 
         <div className="text-center mt-5 space-y-1">
           <p className="text-stone-400 text-xs">
-            Made with 🏏 by <span className="text-saffron-500 font-bold">Kunal Kotak</span> &amp; <span className="text-blue-500 font-bold">Yash Jani</span>
+            Made with <img src="/icon.png" className="w-4 h-4 inline-block mx-0.5" alt="🏏" /> by <span className="text-saffron-500 font-bold">Kunal Kotak</span> &amp; <span className="text-blue-500 font-bold">Yash Jani</span>
           </p>
           <Link href="/" className="flex items-center justify-center gap-1 text-stone-400 hover:text-stone-600 text-xs font-medium">
             <FiArrowLeft size={12}/> Back to Home
