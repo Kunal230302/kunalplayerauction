@@ -219,25 +219,6 @@ export default function Home() {
 
 
 
-      {/* ── Recent Auction Section ─────────────────────────────────── */}
-      <section id="recent-auctions" className="py-16 px-4 bg-stone-50">
-        <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-12 relative">
-            <h2 className="text-4xl sm:text-5xl font-serif font-extrabold text-blue-950 mb-4 tracking-tight">Recent Auction</h2>
-            <div className="flex items-center justify-center gap-4 max-w-sm mx-auto">
-              <div className="h-[1px] bg-red-500/30 flex-1" />
-              <img src="/gavel.png" className="w-5 h-5 object-contain opacity-50 rotate-[-15deg]" alt="Gavel Icon" />
-              <div className="h-[1px] bg-red-500/30 flex-1" />
-            </div>
-          </div>
-
-          <div className="bg-white/50 backdrop-blur rounded-3xl border-2 border-dashed border-blue-200 py-16 text-center shadow-inner">
-            <div className="text-5xl mb-4 opacity-30">🔔</div>
-            <p className="text-blue-900/40 font-serif text-xl font-bold italic">Stay tuned for upcoming professional auctions!</p>
-            <p className="text-stone-400 text-sm mt-2">New tournaments will appear here once they go live.</p>
-          </div>
-        </div>
-      </section>
 
       {/* ── Tournaments ──────────────────────────────────────────── */}
       <section id="tournaments" className="py-16 px-4">
