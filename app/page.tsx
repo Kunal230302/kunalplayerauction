@@ -123,7 +123,7 @@ export default function Home() {
           </div>
 
           <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold leading-tight mb-4 drop-shadow-lg">
-            {settings.auctionTitle || 'Cricket Player Auction 2025'}
+            {settings.auctionTitle || 'Cricket Player Auction 2026'}
           </h1>
 
           {settings.auctionDate && (
@@ -159,7 +159,7 @@ export default function Home() {
       {/* ── Ticker ──────────────────────────────────────────────────── */}
       <div className="ticker-wrap py-2 overflow-hidden">
         <span className="ticker-text px-8">
-          🏏 Welcome to PlayerAuctionHub &nbsp;•&nbsp; {settings.auctionTitle || 'Cricket Auction 2025'} &nbsp;•&nbsp;
+          🏏 Welcome to PlayerAuctionHub &nbsp;•&nbsp; {settings.auctionTitle || 'Cricket Auction 2026'} &nbsp;•&nbsp;
           {stats.total} Players Registered &nbsp;•&nbsp; {stats.sold} Players Sold &nbsp;•&nbsp;
           {tournaments.length} Tournaments Registered &nbsp;•&nbsp;
           Login to participate in Live Auction &nbsp;•&nbsp; playerauctionhub.in &nbsp;•&nbsp; 🏆
@@ -359,7 +359,7 @@ export default function Home() {
               <FiInstagram size={14}/> @yash_jani_
             </a>
           </div>
-          <p className="text-xs text-stone-600 mt-4">© 2025 PlayerAuctionHub. All rights reserved.</p>
+          <p className="text-xs text-stone-600 mt-4">© 2026 PlayerAuctionHub. All rights reserved.</p>
         </div>
       </footer>
     </div>

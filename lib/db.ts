@@ -99,7 +99,7 @@ export const getSettings = async (tournamentId?: string): Promise<Settings> => {
   const path = tournamentId ? `tournaments/${tournamentId}/meta/settings` : 'settings/main'
   const s = await getDoc(doc(db, path))
   return s.exists() ? s.data() as Settings : {
-    auctionTitle: 'Local Cricket Auction 2025', auctionDate: '',
+    auctionTitle: 'Local Cricket Auction 2026', auctionDate: '',
     bidIncrement: 10000, timerSeconds: 30, status: 'idle',
     basePrice: 5000, teamBudget: 500000,
     bidTier1Limit: 50000, bidTier1Inc: 10000,

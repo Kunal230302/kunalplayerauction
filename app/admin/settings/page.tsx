@@ -60,7 +60,7 @@ export default function SettingsPage() {
           <p className="text-xs font-bold text-stone-400 uppercase tracking-wider">🏆 General</p>
           <div>
             <label className="label">Tournament / Auction Title</label>
-            <input className="input" placeholder="e.g. DTPL 2025"
+            <input className="input" placeholder="e.g. DTPL 2026"
               value={form.auctionTitle} onChange={e=>setForm({...form,auctionTitle:e.target.value})}/>
           </div>
           <div>

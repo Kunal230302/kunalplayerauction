@@ -299,7 +299,7 @@ export default function TournamentsPage() {
               {/* Name & Description */}
               <div>
                 <label className="label">Tournament Name *</label>
-                <input className="input" placeholder="e.g. Unjha Premier League 2025" value={form.name} onChange={e => F('name', e.target.value)}/>
+                <input className="input" placeholder="e.g. Unjha Premier League 2026" value={form.name} onChange={e => F('name', e.target.value)}/>
               </div>
               <div>
                 <label className="label">Description</label>
