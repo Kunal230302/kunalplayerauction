@@ -5,7 +5,6 @@ import Link from 'next/link'
 import { useParams } from 'next/navigation'
 import { getTournamentByCode, getTeams, getPlayers, addPlayer, Tournament, Team, Player } from '@/lib/db'
 import { uploadToCloudinary } from '@/lib/cloudinary'
-import OTPVerify from '@/components/OTPVerify'
 import { FiUsers, FiShield, FiMapPin, FiZap, FiCopy, FiUpload, FiPlus, FiX, FiCamera } from 'react-icons/fi'
 import toast from 'react-hot-toast'
 
@@ -69,7 +68,6 @@ export default function TournamentPage() {
   const [photoPreview, setPhotoPreview] = useState('')
   const [paymentSS, setPaymentSS] = useState<File | null>(null)
   const [paymentPreview, setPaymentPreview] = useState('')
-  const [phoneVerified, setPhoneVerified] = useState(false)
   const [form, setForm] = useState({
     name: '', surname: '', mobile: '', dob: '', district: '', taluka: '', role: 'Batsman',
   })
@@ -126,7 +124,6 @@ export default function TournamentPage() {
     if (!form.name.trim()) { toast.error('Player name required'); return }
     if (!form.surname.trim()) { toast.error('Surname required'); return }
     if (!form.mobile.trim() || form.mobile.length < 10) { toast.error('Enter valid 10-digit mobile number'); return }
-    if (!phoneVerified) { toast.error('Verify your phone number with OTP first'); return }
     if (!form.dob) { toast.error('Date of birth required'); return }
     if (!tournament) return
     const isFull = tournament.totalPlayersRequired > 0 && players.length >= tournament.totalPlayersRequired
@@ -150,7 +147,6 @@ export default function TournamentPage() {
       toast.success(`${form.name} ${form.surname} registered! 🏏`)
       setForm({ name: '', surname: '', mobile: '', dob: '', district: '', taluka: '', role: 'Batsman' })
       setPhoto(null); setPhotoPreview(''); setPaymentSS(null); setPaymentPreview('')
-      setPhoneVerified(false)
       setShowForm(false); load()
     } catch (e: any) { toast.error(e.message) }
     setSaving(false)
@@ -290,26 +286,13 @@ export default function TournamentPage() {
                 <div>
                   <label className="label">📱 Mobile Number *</label>
                   <input className="input" type="tel" maxLength={10} placeholder="9876543210" value={form.mobile}
-                    onChange={e => { F('mobile', e.target.value.replace(/\D/g, '').slice(0, 10)); setPhoneVerified(false) }}/>
+                    onChange={e => F('mobile', e.target.value.replace(/\D/g, '').slice(0, 10))}/>
                 </div>
                 <div>
                   <label className="label">🎂 Date of Birth *</label>
                   <input className="input" type="date" value={form.dob} onChange={e => F('dob', e.target.value)}/>
                 </div>
               </div>
-
-              {/* ── Phone OTP Verification ── */}
-              {form.mobile.length === 10 && !phoneVerified && (
-                <OTPVerify
-                  phoneNumber={form.mobile}
-                  onVerified={() => { setPhoneVerified(true); toast.success('✅ Phone verified!') }}
-                />
-              )}
-              {phoneVerified && (
-                <div className="bg-green-50 border-2 border-green-300 rounded-xl p-3 text-center">
-                  <span className="text-green-700 font-bold text-sm">✅ Phone Verified — {form.mobile}</span>
-                </div>
-              )}
 
               {/* ── District & Taluka ── */}
               <div className="grid grid-cols-2 gap-3">

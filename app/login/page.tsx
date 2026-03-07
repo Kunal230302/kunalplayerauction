@@ -3,35 +3,22 @@ export const dynamic = 'force-dynamic'
 import { useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { FiMail, FiLock, FiEye, FiEyeOff, FiArrowLeft, FiPhone } from 'react-icons/fi'
+import { FiMail, FiLock, FiEye, FiEyeOff, FiArrowLeft } from 'react-icons/fi'
 import { useAuth } from '@/lib/auth'
-import { RecaptchaVerifier, signInWithPhoneNumber } from 'firebase/auth'
-import { auth } from '@/lib/firebase'
-import { doc, getDoc } from 'firebase/firestore'
-import { db } from '@/lib/firebase'
 import toast from 'react-hot-toast'
 
 export default function LoginPage() {
-  const [tab, setTab] = useState<'email' | 'phone'>('email')
   const [email,   setEmail]   = useState('')
   const [pass,    setPass]    = useState('')
   const [showPw,  setShowPw]  = useState(false)
   const [loading, setLoading] = useState(false)
   const [forgot,  setForgot]  = useState(false)
-
-  // Phone login state
-  const [phone, setPhone]     = useState('')
-  const [otpSent, setOtpSent] = useState(false)
-  const [otp, setOtp]         = useState('')
-  const [confirmResult, setConfirmResult] = useState<any>(null)
-  const [timer, setTimer]     = useState(0)
-
   const { login, logout, resetPwd, appUser, loading: authLoading } = useAuth()
   const router = useRouter()
 
   const dashboardUrl = appUser?.role === 'admin' ? '/admin/dashboard' : '/team/dashboard'
 
-  // If already logged in
+  // If already logged in, show welcome-back screen
   if (!authLoading && appUser) {
     return (
       <div className="min-h-screen flex items-center justify-center p-4"
@@ -54,7 +41,6 @@ export default function LoginPage() {
     )
   }
 
-  // Email login
   const handleLogin = async () => {
     if (!email.trim() || !pass.trim()) { toast.error('Enter email and password'); return }
     setLoading(true)
@@ -71,54 +57,6 @@ export default function LoginPage() {
     setLoading(false)
   }
 
-  // Phone OTP send
-  const sendPhoneOTP = async () => {
-    if (!phone || phone.length < 10) { toast.error('Enter valid 10-digit phone number'); return }
-    setLoading(true)
-    try {
-      // Clear old recaptcha
-      const container = document.getElementById('recaptcha-login')
-      if (container) container.innerHTML = ''
-      const recaptcha = new RecaptchaVerifier(auth, 'recaptcha-login', { size: 'invisible' })
-      const fullNumber = `+91${phone.replace(/\D/g, '').slice(-10)}`
-      const result = await signInWithPhoneNumber(auth, fullNumber, recaptcha)
-      setConfirmResult(result)
-      setOtpSent(true)
-      setTimer(60)
-      const iv = setInterval(() => setTimer(t => { if (t <= 1) { clearInterval(iv); return 0 } return t - 1 }), 1000)
-      toast.success('OTP sent! 📲')
-    } catch (e: any) {
-      if (e.code === 'auth/too-many-requests') toast.error('Too many attempts. Wait and try again.')
-      else toast.error(e.message || 'Failed to send OTP')
-    }
-    setLoading(false)
-  }
-
-  // Verify phone OTP
-  const verifyPhoneOTP = async () => {
-    if (otp.length !== 6) { toast.error('Enter 6-digit OTP'); return }
-    if (!confirmResult) { toast.error('OTP expired. Send again.'); return }
-    setLoading(true)
-    try {
-      const credential = await confirmResult.confirm(otp)
-      const uid = credential.user.uid
-
-      // Check if user exists in Firestore
-      const userDoc = await getDoc(doc(db, 'users', uid))
-      if (userDoc.exists()) {
-        const userData = userDoc.data()
-        toast.success(`Welcome, ${userData.displayName || 'User'}! 🏏`)
-        router.push(userData.role === 'admin' ? '/admin/dashboard' : '/team/dashboard')
-      } else {
-        toast.success('Phone verified! 📱')
-        router.push('/team/dashboard')
-      }
-    } catch {
-      toast.error('Wrong OTP. Try again.')
-    }
-    setLoading(false)
-  }
-
   const handleReset = async () => {
     if (!email.trim()) { toast.error('Enter your email first'); return }
     try { await resetPwd(email.trim()); toast.success('Password reset link sent!'); setForgot(false) }
@@ -131,8 +69,6 @@ export default function LoginPage() {
 
       <div className="absolute inset-0 opacity-[0.03] pointer-events-none select-none"
         style={{ backgroundImage: 'repeating-linear-gradient(45deg, #f97316 0, #f97316 1px, transparent 0, transparent 50%)', backgroundSize: '30px 30px' }}/>
-
-      <div id="recaptcha-login" />
 
       <div className="relative w-full max-w-md">
         {/* Logo */}
@@ -155,101 +91,40 @@ export default function LoginPage() {
         <div className="card p-7 shadow-2xl border-2 border-saffron-100">
           {!forgot ? (
             <div className="space-y-4">
-              {/* Tab Switcher */}
-              <div className="flex bg-stone-100 rounded-xl p-1 gap-1">
-                <button onClick={() => setTab('email')}
-                  className={`flex-1 py-2 rounded-lg text-sm font-bold flex items-center justify-center gap-1.5 transition ${tab === 'email' ? 'bg-white shadow text-saffron-600' : 'text-stone-400 hover:text-stone-600'}`}>
-                  <FiMail size={14}/> Email
-                </button>
-                <button onClick={() => setTab('phone')}
-                  className={`flex-1 py-2 rounded-lg text-sm font-bold flex items-center justify-center gap-1.5 transition ${tab === 'phone' ? 'bg-white shadow text-saffron-600' : 'text-stone-400 hover:text-stone-600'}`}>
-                  <FiPhone size={14}/> Phone OTP
+              {/* Email */}
+              <div>
+                <label className="label">Email Address</label>
+                <div className="relative">
+                  <FiMail className="absolute left-4 top-1/2 -translate-y-1/2 text-stone-400" size={16}/>
+                  <input className="input pl-11" type="email" placeholder="your@email.com"
+                    value={email} onChange={e => setEmail(e.target.value)}
+                    onKeyDown={e => e.key==='Enter' && handleLogin()} autoFocus/>
+                </div>
+              </div>
+              {/* Password */}
+              <div>
+                <label className="label">Password</label>
+                <div className="relative">
+                  <FiLock className="absolute left-4 top-1/2 -translate-y-1/2 text-stone-400" size={16}/>
+                  <input className="input pl-11 pr-12" type={showPw ? 'text' : 'password'} placeholder="Enter password"
+                    value={pass} onChange={e => setPass(e.target.value)}
+                    onKeyDown={e => e.key==='Enter' && handleLogin()}/>
+                  <button type="button" onClick={() => setShowPw(!showPw)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-stone-400 hover:text-stone-600 rounded-lg">
+                    {showPw ? <FiEyeOff size={16}/> : <FiEye size={16}/>}
+                  </button>
+                </div>
+              </div>
+              <div className="flex justify-end">
+                <button onClick={() => setForgot(true)} className="text-saffron-500 hover:text-saffron-700 text-xs font-bold hover:underline">
+                  Forgot password?
                 </button>
               </div>
-
-              {tab === 'email' ? (
-                <>
-                  {/* Email */}
-                  <div>
-                    <label className="label">Email Address</label>
-                    <div className="relative">
-                      <FiMail className="absolute left-4 top-1/2 -translate-y-1/2 text-stone-400" size={16}/>
-                      <input className="input pl-11" type="email" placeholder="your@email.com"
-                        value={email} onChange={e => setEmail(e.target.value)}
-                        onKeyDown={e => e.key==='Enter' && handleLogin()} autoFocus/>
-                    </div>
-                  </div>
-                  {/* Password */}
-                  <div>
-                    <label className="label">Password</label>
-                    <div className="relative">
-                      <FiLock className="absolute left-4 top-1/2 -translate-y-1/2 text-stone-400" size={16}/>
-                      <input className="input pl-11 pr-12" type={showPw ? 'text' : 'password'} placeholder="Enter password"
-                        value={pass} onChange={e => setPass(e.target.value)}
-                        onKeyDown={e => e.key==='Enter' && handleLogin()}/>
-                      <button type="button" onClick={() => setShowPw(!showPw)}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-stone-400 hover:text-stone-600 rounded-lg">
-                        {showPw ? <FiEyeOff size={16}/> : <FiEye size={16}/>}
-                      </button>
-                    </div>
-                  </div>
-                  <div className="flex justify-end">
-                    <button onClick={() => setForgot(true)} className="text-saffron-500 hover:text-saffron-700 text-xs font-bold hover:underline">
-                      Forgot password?
-                    </button>
-                  </div>
-                  <button onClick={handleLogin} disabled={loading} className="btn-primary w-full py-3.5 text-base">
-                    {loading
-                      ? <span className="flex items-center gap-2"><svg className="animate-spin w-4 h-4" viewBox="0 0 24 24" fill="none"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>Logging in...</span>
-                      : '🏏 Login to Auction'}
-                  </button>
-                </>
-              ) : (
-                /* ── Phone OTP Login ── */
-                <>
-                  {!otpSent ? (
-                    <>
-                      <div>
-                        <label className="label">📱 Phone Number</label>
-                        <div className="relative">
-                          <span className="absolute left-4 top-1/2 -translate-y-1/2 text-stone-500 font-bold text-sm">+91</span>
-                          <input className="input pl-14" type="tel" maxLength={10} placeholder="9876543210"
-                            value={phone} onChange={e => setPhone(e.target.value.replace(/\D/g, '').slice(0, 10))}
-                            onKeyDown={e => e.key === 'Enter' && sendPhoneOTP()} autoFocus/>
-                        </div>
-                      </div>
-                      <button onClick={sendPhoneOTP} disabled={loading || phone.length < 10} className="btn-primary w-full py-3.5 text-base">
-                        {loading ? '⏳ Sending OTP…' : '📲 Send OTP'}
-                      </button>
-                    </>
-                  ) : (
-                    <>
-                      <div className="bg-green-50 border-2 border-green-200 rounded-xl p-3 text-center">
-                        <p className="text-sm text-green-700 font-semibold">✅ OTP Sent to +91 {phone}</p>
-                      </div>
-                      <div>
-                        <label className="label">Enter 6-digit OTP</label>
-                        <input className="input text-center text-2xl tracking-[0.5em] font-bold"
-                          type="text" maxLength={6} placeholder="● ● ● ● ● ●"
-                          value={otp} onChange={e => setOtp(e.target.value.replace(/\D/g, ''))}
-                          onKeyDown={e => e.key === 'Enter' && verifyPhoneOTP()} autoFocus/>
-                      </div>
-                      <button onClick={verifyPhoneOTP} disabled={loading || otp.length !== 6} className="btn-primary w-full py-3.5 text-base">
-                        {loading ? '⏳ Verifying…' : '✅ Verify & Login'}
-                      </button>
-                      <div className="flex justify-between text-xs">
-                        <button onClick={sendPhoneOTP} disabled={timer > 0 || loading}
-                          className="text-saffron-600 font-bold hover:underline disabled:text-stone-300">
-                          {timer > 0 ? `Resend in ${timer}s` : '🔄 Resend OTP'}
-                        </button>
-                        <button onClick={() => { setOtpSent(false); setOtp('') }}
-                          className="text-stone-400 hover:text-stone-600">Change Number</button>
-                      </div>
-                    </>
-                  )}
-                </>
-              )}
-
+              <button onClick={handleLogin} disabled={loading} className="btn-primary w-full py-3.5 text-base">
+                {loading
+                  ? <span className="flex items-center gap-2"><svg className="animate-spin w-4 h-4" viewBox="0 0 24 24" fill="none"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>Logging in...</span>
+                  : '🏏 Login to Auction'}
+              </button>
               <div className="bg-amber-50 border-2 border-amber-100 rounded-xl p-3 text-center">
                 <p className="text-amber-700 text-xs font-semibold">Contact your tournament admin for login credentials</p>
               </div>
