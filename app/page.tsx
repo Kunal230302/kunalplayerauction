@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { getSettings, getPlayers, getTournaments, Tournament } from '@/lib/db'
 import { FiLogIn, FiInstagram, FiMapPin } from 'react-icons/fi'
+import SplashScreen from '@/components/SplashScreen'
 
 /* ── Countdown timer ── */
 function Countdown({ target }: { target: string }) {
@@ -60,7 +61,7 @@ function GavelOverlay({ show, onDone }: { show: boolean; onDone: () => void }) {
 }
 
 function useGavel() {
-  const [show, setShow] = useState(true)    // true = fires on page load too
+  const [show, setShow] = useState(false)    // Changed to false so it doesn't double-trigger with splash
   const trigger = () => { if (!show) setShow(true) }
   const done = () => setShow(false)
   return { show, trigger, done }
@@ -70,6 +71,8 @@ export default function Home() {
   const [settings, setSettings] = useState<any>({})
   const [stats,    setStats]    = useState({ total:0, sold:0 })
   const [tournaments, setTournaments] = useState<Tournament[]>([])
+
+  const [showSplash, setShowSplash] = useState(true)
 
   useEffect(() => {
     Promise.all([getSettings(), getPlayers(), getTournaments()]).then(([s,p,tr]) => {
@@ -87,6 +90,7 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-stone-50">
+      {showSplash && <SplashScreen onComplete={() => setShowSplash(false)} />}
       <GavelOverlay show={gavel.show} onDone={gavel.done} />
 
       {/* ── Top nav ─────────────────────────────────────────────────── */}
