@@ -230,7 +230,7 @@ export default function RegisterTournament() {
           <div>
             <h1 className="text-3xl font-black text-stone-800 mb-2 tracking-tight">Register Your Tournament</h1>
             <p className="text-stone-500 font-medium italic">
-              Professional Cricket Auction Platform | પ્રોફેશનલ ઓક્શન પ્લેટફોર્મ
+              India's Dedicated Digital Platform for Cricket Auctions | પ્રોફેશનલ ઓક્શન પ્લેટફોર્મ
             </p>
           </div>
         </div>

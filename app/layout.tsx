@@ -4,8 +4,8 @@ import { AuthProvider } from '@/lib/auth'
 import { Toaster } from 'react-hot-toast'
 
 export const metadata: Metadata = {
-  title: 'PlayerAuctionHub – Professional Cricket Auction Platform',
-  description: 'Pro-level cricket player auction platform for professional tournaments. playerauctionhub.in',
+  title: "Player Auction Hub – India's Dedicated Digital Platform for Cricket Auctions",
+  description: "Cricket Auction Hub is India’s most trusted digital platform designed specifically for cricket. We’ve removed the clutter of other sports to focus 100% on the gentleman's game. From local club leagues to massive corporate tournaments, manage your player bidding with professional-grade tools.",
   icons: {
     icon: '/icon.png',
   },

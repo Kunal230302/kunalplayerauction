@@ -27,8 +27,8 @@ export default function SplashScreen({ onComplete }: { onComplete: () => void })
         <h1 className="text-4xl sm:text-5xl font-black tracking-tighter bg-gradient-to-b from-saffron-300 via-saffron-500 to-saffron-700 bg-clip-text text-transparent animate-pulse-slow px-4">
           Bidding...
         </h1>
-        <p className="mt-6 text-saffron-500/60 font-bold uppercase tracking-[0.4em] text-[10px] sm:text-xs">
-          Professional Cricket Auction Platform
+        <p className="mt-6 text-saffron-500/60 font-bold uppercase tracking-[0.2em] text-[10px] sm:text-xs px-6">
+          India's Dedicated Digital Platform for Cricket Auctions
         </p>
       </div>
 

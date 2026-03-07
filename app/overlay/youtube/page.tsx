@@ -63,7 +63,7 @@ export default function YouTubeOverlay() {
             PLAYERAUCTIONHUB
           </span>
           <span style={{ color: 'rgba(255,255,255,0.7)', fontSize: '11px', fontWeight: 700, marginLeft: '8px', letterSpacing: '0.5px' }}>
-            PROFESSIONAL CRICKET AUCTION PLATFORM | પ્રોફેશનલ ઓક્શન પ્લેટફોર્મ
+            INDIA'S DEDICATED DIGITAL PLATFORM FOR CRICKET AUCTIONS | પ્રોફેશનલ ઓક્શન પ્લેટફોર્મ
           </span>
           <div style={{ flex: 1 }} />
           <div style={{

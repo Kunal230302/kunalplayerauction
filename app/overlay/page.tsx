@@ -96,7 +96,7 @@ export default function OverlayPage() {
           🏆 Player Auction Hub
         </div>
         <div style={{ color:'rgba(255,255,255,0.7)', fontSize:'11px', letterSpacing:'0.5px', textTransform:'uppercase', fontWeight:700 }}>
-          PROFESSIONAL CRICKET AUCTION PLATFORM | પ્રોફેશનલ ઓક્શન પ્લેટફોર્મ
+          INDIA'S DEDICATED DIGITAL PLATFORM FOR CRICKET AUCTIONS | પ્રોફેશનલ ઓક્શન પ્લેટફોર્મ
         </div>
       </div>
 

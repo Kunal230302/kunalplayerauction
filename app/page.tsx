@@ -119,18 +119,26 @@ export default function Home() {
       {/* ── Hero ────────────────────────────────────────────────────── */}
       <section className="relative pt-14 overflow-hidden">
         {/* Layered bg */}
-        <div className="absolute inset-0 bg-gradient-to-br from-saffron-700 via-saffron-600 to-orange-500"/>
-        <div className="absolute inset-0 opacity-[0.07]" style={{backgroundImage:'repeating-linear-gradient(45deg,#fff 0,#fff 1px,transparent 0,transparent 50%)',backgroundSize:'20px 20px'}}/>
-        <div className="absolute bottom-0 left-0 right-0 h-16 bg-stone-50" style={{clipPath:'ellipse(55% 100% at 50% 100%)'}}/>
+        <div className="absolute inset-0">
+          <img src="/hero-main.jpg" alt="Auction Hero" className="w-full h-full object-cover object-center" />
+          <div className="absolute inset-0 bg-gradient-to-br from-stone-900/90 via-stone-900/40 to-stone-900/80" />
+        </div>
+        <div className="absolute bottom-0 left-0 right-0 h-16 bg-stone-50" style={{clipPath:'ellipse(55% 100% at 50% 100%)'}} />
 
-        <div className="relative z-10 max-w-4xl mx-auto px-4 py-16 sm:py-20 text-white text-center">
-          <div className="inline-flex items-center gap-2 border border-white/30 bg-white/10 backdrop-blur rounded-full px-4 py-1.5 text-xs font-bold tracking-widest uppercase mb-6 text-saffron-100">
-            🏆 Welcome to Player Auction Hub
+        <div className="relative z-10 max-w-5xl mx-auto px-4 py-20 sm:py-24 text-white text-center">
+          <div className="inline-flex items-center gap-2 border border-white/20 bg-white/5 backdrop-blur-md rounded-full px-5 py-2 text-xs font-bold tracking-[0.2em] uppercase mb-8 text-saffron-300 shadow-xl">
+            🏆 India's Dedicated Digital Platform for Cricket Auctions
           </div>
 
-          <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold leading-tight mb-4 drop-shadow-lg">
-            {settings.auctionTitle || 'Cricket Player Auction 2026'}
+          <h1 className="text-5xl sm:text-6xl md:text-7xl font-black leading-tight mb-6 drop-shadow-2xl tracking-tighter">
+            Player Auction Hub
           </h1>
+
+          <p className="max-w-3xl mx-auto text-stone-200 text-base sm:text-lg mb-10 leading-relaxed font-medium drop-shadow-md">
+            Cricket Auction Hub is India’s most trusted digital platform designed specifically for cricket. 
+            We’ve removed the clutter of other sports to focus 100% on the gentleman's game. 
+            From local club leagues to massive corporate tournaments, manage your player bidding with professional-grade tools.
+          </p>
 
           {settings.auctionDate && (
             <p className="text-saffron-100 text-sm font-semibold mb-8 tracking-wide">
@@ -165,7 +173,7 @@ export default function Home() {
       {/* ── Ticker ──────────────────────────────────────────────────── */}
       <div className="bg-saffron-600/50 backdrop-blur text-white py-2 text-[10px] sm:text-xs font-bold uppercase tracking-[0.2em] text-center border-y border-white/10 overflow-hidden whitespace-nowrap">
         <div className="animate-marquee inline-block">
-          Professional Cricket Auction Platform &nbsp;•&nbsp; પ્રોફેશનલ ઓક્શન પ્લેટફોર્મ &nbsp;•&nbsp; {settings.auctionTitle || 'Cricket Auction 2026'} &nbsp;•&nbsp; {stats.total} Players Registered &nbsp;•&nbsp; {stats.sold} Players Sold &nbsp;•&nbsp; {tournaments.length} Tournaments Registered &nbsp;•&nbsp; Login to participate in Live Auction &nbsp;•&nbsp; playerauctionhub.in &nbsp;•&nbsp; 🏆
+          Player Auction Hub &nbsp;•&nbsp; India's Dedicated Digital Platform for Cricket Auctions &nbsp;•&nbsp; પ્રોફેશનલ ઓક્શન પ્લેટફોર્મ &nbsp;•&nbsp; {settings.auctionTitle || 'Cricket Auction 2026'} &nbsp;•&nbsp; {stats.total} Players Registered &nbsp;•&nbsp; {stats.sold} Players Sold &nbsp;•&nbsp; {tournaments.length} Tournaments Registered &nbsp;•&nbsp; Login to participate in Live Auction &nbsp;•&nbsp; playerauctionhub.in &nbsp;•&nbsp; 🏆
         </div>
       </div>
 
