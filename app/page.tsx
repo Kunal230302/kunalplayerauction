@@ -218,6 +218,7 @@ export default function Home() {
       </section>
 
 
+
       {/* ── Recent Auction Section ─────────────────────────────────── */}
       <section id="recent-auctions" className="py-16 px-4 bg-stone-50">
         <div className="max-w-6xl mx-auto">
@@ -230,65 +231,10 @@ export default function Home() {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-            {(tournaments.length > 0 ? tournaments.slice(0, 3) : [
-              { id:'d1', name:'Jngec Boys Hostel Tournament', auctionTitle:'JPL', auctionDate:'2026-03-07', groundLocation:'Sundernagar', logoURL:'' },
-              { id:'d2', name:'Jngec Bh Cricket Tournament', auctionTitle:'77', auctionDate:'2026-03-07', groundLocation:'JNGEC COMMON ROOM BH', logoURL:'' },
-              { id:'d3', name:'Rtpl Season 2', auctionTitle:'RTPL2026', auctionDate:'2026-03-07', groundLocation:'Mumbai', logoURL:'' }
-            ]).map((t: any) => (
-              <div key={t.id} className="bg-blue-900 rounded-[2rem] p-6 shadow-2xl relative overflow-hidden group hover:scale-[1.02] transition-all">
-                {/* Status Indicator Bar */}
-                <div className="flex justify-between items-start mb-6">
-                  <div className="bg-green-600/90 backdrop-blur rounded-full px-4 py-1.5 text-[10px] font-black text-white uppercase tracking-widest flex items-center gap-2">
-                    <div className="w-1.5 h-1.5 bg-white rounded-full animate-pulse" />
-                    Ongoing
-                  </div>
-                  <div className="w-4 h-4 rounded-full bg-green-400 border-2 border-green-500 shadow-[0_0_10px_rgba(74,222,128,0.5)]" />
-                </div>
-
-                {/* Tournament Name Header */}
-                <div className="text-center mb-6 h-12 flex items-center justify-center">
-                  <h3 className="text-white text-lg font-serif font-bold tracking-wide leading-tight px-2 line-clamp-2">{t.name}</h3>
-                </div>
-
-                {/* Content Row */}
-                <div className="flex items-center gap-6">
-                  {/* Circular Logo */}
-                  <div className="w-24 h-24 rounded-full border-4 border-blue-800/50 bg-white shadow-xl flex items-center justify-center overflow-hidden shrink-0">
-                    {t.logoURL ? <img src={t.logoURL} className="w-full h-full object-cover" alt={t.name}/> : <span className="text-4xl">🏆</span>}
-                  </div>
-
-                  {/* Info Details */}
-                  <div className="flex-1 space-y-3">
-                    <div className="text-white/90 font-serif text-lg font-bold truncate">{t.auctionTitle || 'JPL'}</div>
-                    
-                    <div className="flex items-center gap-2 text-white/70 text-xs font-bold">
-                      <FiClock className="shrink-0" size={12} />
-                      {t.auctionDate ? new Date(t.auctionDate).toLocaleDateString('en-GB') : '07/03/2026'}
-                    </div>
-
-                    <div className="flex items-center gap-2 text-white/70 text-xs font-bold">
-                      <FiMapPin className="shrink-0" size={12} />
-                      <span className="truncate max-w-[100px]">{t.groundLocation || 'Sundernagar'}</span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Arrow navigation handles for style */}
-                <div className="absolute top-1/2 left-0 transform -translate-y-1/2 w-8 h-8 rounded-full bg-amber-500/10 flex items-center justify-center text-amber-500 group-hover:left-2 transition-all pointer-events-none opacity-20">
-                  ‹
-                </div>
-                <div className="absolute top-1/2 right-0 transform -translate-y-1/2 w-8 h-8 rounded-full bg-amber-500/10 flex items-center justify-center text-amber-500 group-hover:right-2 transition-all pointer-events-none opacity-20">
-                  ›
-                </div>
-              </div>
-            ))}
-          </div>
-
-          <div className="text-right">
-            <Link href="#tournaments" className="text-blue-900/60 font-bold hover:text-blue-950 transition-colors flex items-center gap-1 justify-end group">
-              View All <span className="group-hover:translate-x-1 transition-transform">→</span>
-            </Link>
+          <div className="bg-white/50 backdrop-blur rounded-3xl border-2 border-dashed border-blue-200 py-16 text-center shadow-inner">
+            <div className="text-5xl mb-4 opacity-30">🔔</div>
+            <p className="text-blue-900/40 font-serif text-xl font-bold italic">Stay tuned for upcoming professional auctions!</p>
+            <p className="text-stone-400 text-sm mt-2">New tournaments will appear here once they go live.</p>
           </div>
         </div>
       </section>
