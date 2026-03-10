@@ -2,7 +2,7 @@
 import { ReactNode, useState, useEffect } from 'react'
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
-import { FiGrid, FiUsers, FiShield, FiZap, FiUserPlus, FiSettings, FiMenu, FiLogOut, FiInstagram, FiHome, FiX, FiAward } from 'react-icons/fi'
+import { FiGrid, FiUsers, FiShield, FiZap, FiUserPlus, FiSettings, FiMenu, FiLogOut, FiInstagram, FiHome, FiX, FiAward, FiTrendingUp } from 'react-icons/fi'
 import { useAuth } from '@/lib/auth'
 
 const NAV = [
@@ -11,6 +11,7 @@ const NAV = [
   { href:'/admin/teams/dashboard', icon:FiShield, label:'Teams' },
   { href:'/admin/tournaments', icon:FiAward,  label:'Tournaments' },
   { href:'/admin/auction',   icon:FiZap,      label:'Live Auction', live:true },
+  { href:'/team-balance',    icon:FiTrendingUp, label:'Team Balance' },
   { href:'/admin/users',     icon:FiUserPlus, label:'User Accounts' },
   { href:'/admin/settings',  icon:FiSettings, label:'Settings' },
 ]
@@ -60,8 +61,9 @@ function Sidebar({ close }: { close?: () => void }) {
         </div>
         <div className="pt-1 border-t border-stone-100 mt-1">
           <p className="px-3 pt-1 pb-0.5 text-[9px] text-stone-400 font-bold uppercase tracking-widest">Overlays</p>
-          <a href="/overlay" target="_blank" onClick={close} className="nav-link"><span className="text-sm">📺 OBS Overlay</span></a>
-          <a href="/overlay/youtube" target="_blank" onClick={close} className="nav-link"><span className="text-sm">🔴 YouTube Live</span></a>
+          <a href="/overlay" target="_blank" onClick={close} className="nav-link"><span className="text-sm">📺 Professional OBS</span></a>
+          <a href="/overlay/youtube" target="_blank" onClick={close} className="nav-link"><span className="text-sm">🎥 Mobile Stream</span></a>
+          <a href="/overlay/help" target="_blank" onClick={close} className="nav-link"><span className="text-xs">📖 Setup Guide</span></a>
         </div>
       </nav>
 

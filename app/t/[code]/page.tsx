@@ -12,42 +12,42 @@ const ballEmoji: Record<string, string> = {
   'Tennis Ball': '🎾', 'Leather Ball': '🏏', 'Heavy Tennis Ball': '🥎',
   'Mini Ball (Smiley)': '😊', 'Plastic Ball': '⚪',
 }
-const T_RING = ['border-red-400 text-red-700 bg-red-50','border-blue-400 text-blue-700 bg-blue-50','border-green-500 text-green-700 bg-green-50','border-purple-500 text-purple-700 bg-purple-50']
+const T_RING = ['border-red-400 text-red-700 bg-red-50', 'border-blue-400 text-blue-700 bg-blue-50', 'border-green-500 text-green-700 bg-green-50', 'border-purple-500 text-purple-700 bg-purple-50']
 const ROLES = ['Batsman', 'Bowler', 'All-Rounder', 'Wicket Keeper']
 
 /* ── Gujarat Talukas by district ── */
 const DISTRICT_TALUKAS: Record<string, string[]> = {
-  'Ahmedabad': ['Ahmedabad City','Daskroi','Dholka','Sanand','Bavla','Dhandhuka','Viramgam','Detroj-Rampura','Mandal'],
-  'Mehsana': ['Mehsana','Visnagar','Unjha','Patan','Kadi','Kalol','Kheralu','Satlasana','Jotana','Vadnagar','Becharaji'],
-  'Banaskantha': ['Palanpur','Deesa','Dhanera','Tharad','Vadgam','Kankrej','Dantiwada','Amirgadh','Deodar','Bhabhar','Lakhani','Suigam','Vav'],
-  'Sabarkantha': ['Himmatnagar','Idar','Prantij','Khedbrahma','Modasa','Bhiloda','Vijaynagar','Bayad','Dhansura','Malpur','Meghraj'],
-  'Gandhinagar': ['Gandhinagar','Kalol','Dehgam','Mansa'],
-  'Patan': ['Patan','Chanasma','Harij','Santalpur','Radhanpur','Sami','Shankheshwar','Sidhpur'],
-  'Kutch': ['Bhuj','Gandhidham','Anjar','Mandvi','Mundra','Nakhatrana','Abdasa','Lakhpat','Rapar','Bhachau'],
-  'Rajkot': ['Rajkot','Morbi','Gondal','Jetpur','Dhoraji','Upleta','Jasdan','Wankaner','Paddhari','Lodhika','Kotda Sangani','Jamkandorna'],
-  'Surat': ['Surat City','Olpad','Kamrej','Bardoli','Mahuva','Mandvi','Mangrol','Palsana','Choryasi','Umarpada'],
-  'Vadodara': ['Vadodara City','Savli','Padra','Karjan','Dabhoi','Waghodia','Sinor','Sankheda','Nasvadi'],
-  'Junagadh': ['Junagadh','Visavadar','Manavadar','Vanthali','Mendarda','Keshod','Mangrol','Malia','Una','Kodinar','Sutrapada','Veraval'],
-  'Bhavnagar': ['Bhavnagar','Sihor','Palitana','Mahua','Talaja','Gariadhar','Ghogha','Jesar','Umrala','Vallabhipur'],
-  'Jamnagar': ['Jamnagar','Dhrol','Kalavad','Jamjodhpur','Lalpur','Jodia','Khambhalia'],
-  'Amreli': ['Amreli','Savarkundla','Lilia','Liliya','Rajula','Jafrabad','Babra','Dhari','Khambha','Bagasara','Lathi','Kunkavav'],
-  'Anand': ['Anand','Petlad','Khambhat','Borsad','Sojitra','Tarapur','Umreth'],
-  'Kheda': ['Nadiad','Kheda','Kapadvanj','Thasra','Kathlal','Galteshwar','Matar','Mehmedabad'],
-  'Bharuch': ['Bharuch','Ankleshwar','Hansot','Jambusar','Amod','Jhagadia','Netrang','Vagra','Valia'],
-  'Narmada': ['Rajpipla','Dediapada','Garudeshwar','Sagbara','Tilakwada'],
-  'Valsad': ['Valsad','Pardi','Dharampur','Umbergaon','Kaparada'],
-  'Navsari': ['Navsari','Gandevi','Jalalpore','Chikhli','Khergam','Vansda'],
-  'Tapi': ['Vyara','Songadh','Uchchhal','Valod','Nizar','Dolvan'],
-  'Dang': ['Ahwa','Waghai','Subir'],
-  'Aravalli': ['Modasa','Bayad','Bhiloda','Dhansura','Malpur','Meghraj'],
-  'Gir Somnath': ['Veraval','Somnath','Una','Kodinar','Sutrapada','Talala'],
-  'Devbhoomi Dwarka': ['Dwarka','Khambhalia','Kalyanpur','Bhanvad'],
-  'Mahisagar': ['Lunawada','Kadana','Santrampur','Khanpur','Balasinor'],
-  'Chhota Udepur': ['Chhota Udepur','Kavant','Nasvadi','Jetpur Pavi','Bodeli','Sankheda'],
-  'Botad': ['Botad','Gadhada','Barwala','Ranpur'],
-  'Morbi': ['Morbi','Wankaner','Halvad','Maliya','Tankara'],
-  'Surendranagar': ['Surendranagar','Wadhwan','Limbdi','Chotila','Sayla','Dhrangadhra','Halvad','Muli','Lakhtar','Thangadh'],
-  'Porbandar': ['Porbandar','Kutiyana','Ranavav'],
+  'Ahmedabad': ['Ahmedabad City', 'Daskroi', 'Dholka', 'Sanand', 'Bavla', 'Dhandhuka', 'Viramgam', 'Detroj-Rampura', 'Mandal'],
+  'Mehsana': ['Mehsana', 'Visnagar', 'Unjha', 'Patan', 'Kadi', 'Kalol', 'Kheralu', 'Satlasana', 'Jotana', 'Vadnagar', 'Becharaji'],
+  'Banaskantha': ['Palanpur', 'Deesa', 'Dhanera', 'Tharad', 'Vadgam', 'Kankrej', 'Dantiwada', 'Amirgadh', 'Deodar', 'Bhabhar', 'Lakhani', 'Suigam', 'Vav'],
+  'Sabarkantha': ['Himmatnagar', 'Idar', 'Prantij', 'Khedbrahma', 'Modasa', 'Bhiloda', 'Vijaynagar', 'Bayad', 'Dhansura', 'Malpur', 'Meghraj'],
+  'Gandhinagar': ['Gandhinagar', 'Kalol', 'Dehgam', 'Mansa'],
+  'Patan': ['Patan', 'Chanasma', 'Harij', 'Santalpur', 'Radhanpur', 'Sami', 'Shankheshwar', 'Sidhpur'],
+  'Kutch': ['Bhuj', 'Gandhidham', 'Anjar', 'Mandvi', 'Mundra', 'Nakhatrana', 'Abdasa', 'Lakhpat', 'Rapar', 'Bhachau'],
+  'Rajkot': ['Rajkot', 'Morbi', 'Gondal', 'Jetpur', 'Dhoraji', 'Upleta', 'Jasdan', 'Wankaner', 'Paddhari', 'Lodhika', 'Kotda Sangani', 'Jamkandorna'],
+  'Surat': ['Surat City', 'Olpad', 'Kamrej', 'Bardoli', 'Mahuva', 'Mandvi', 'Mangrol', 'Palsana', 'Choryasi', 'Umarpada'],
+  'Vadodara': ['Vadodara City', 'Savli', 'Padra', 'Karjan', 'Dabhoi', 'Waghodia', 'Sinor', 'Sankheda', 'Nasvadi'],
+  'Junagadh': ['Junagadh', 'Visavadar', 'Manavadar', 'Vanthali', 'Mendarda', 'Keshod', 'Mangrol', 'Malia', 'Una', 'Kodinar', 'Sutrapada', 'Veraval'],
+  'Bhavnagar': ['Bhavnagar', 'Sihor', 'Palitana', 'Mahua', 'Talaja', 'Gariadhar', 'Ghogha', 'Jesar', 'Umrala', 'Vallabhipur'],
+  'Jamnagar': ['Jamnagar', 'Dhrol', 'Kalavad', 'Jamjodhpur', 'Lalpur', 'Jodia', 'Khambhalia'],
+  'Amreli': ['Amreli', 'Savarkundla', 'Lilia', 'Liliya', 'Rajula', 'Jafrabad', 'Babra', 'Dhari', 'Khambha', 'Bagasara', 'Lathi', 'Kunkavav'],
+  'Anand': ['Anand', 'Petlad', 'Khambhat', 'Borsad', 'Sojitra', 'Tarapur', 'Umreth'],
+  'Kheda': ['Nadiad', 'Kheda', 'Kapadvanj', 'Thasra', 'Kathlal', 'Galteshwar', 'Matar', 'Mehmedabad'],
+  'Bharuch': ['Bharuch', 'Ankleshwar', 'Hansot', 'Jambusar', 'Amod', 'Jhagadia', 'Netrang', 'Vagra', 'Valia'],
+  'Narmada': ['Rajpipla', 'Dediapada', 'Garudeshwar', 'Sagbara', 'Tilakwada'],
+  'Valsad': ['Valsad', 'Pardi', 'Dharampur', 'Umbergaon', 'Kaparada'],
+  'Navsari': ['Navsari', 'Gandevi', 'Jalalpore', 'Chikhli', 'Khergam', 'Vansda'],
+  'Tapi': ['Vyara', 'Songadh', 'Uchchhal', 'Valod', 'Nizar', 'Dolvan'],
+  'Dang': ['Ahwa', 'Waghai', 'Subir'],
+  'Aravalli': ['Modasa', 'Bayad', 'Bhiloda', 'Dhansura', 'Malpur', 'Meghraj'],
+  'Gir Somnath': ['Veraval', 'Somnath', 'Una', 'Kodinar', 'Sutrapada', 'Talala'],
+  'Devbhoomi Dwarka': ['Dwarka', 'Khambhalia', 'Kalyanpur', 'Bhanvad'],
+  'Mahisagar': ['Lunawada', 'Kadana', 'Santrampur', 'Khanpur', 'Balasinor'],
+  'Chhota Udepur': ['Chhota Udepur', 'Kavant', 'Nasvadi', 'Jetpur Pavi', 'Bodeli', 'Sankheda'],
+  'Botad': ['Botad', 'Gadhada', 'Barwala', 'Ranpur'],
+  'Morbi': ['Morbi', 'Wankaner', 'Halvad', 'Maliya', 'Tankara'],
+  'Surendranagar': ['Surendranagar', 'Wadhwan', 'Limbdi', 'Chotila', 'Sayla', 'Dhrangadhra', 'Halvad', 'Muli', 'Lakhtar', 'Thangadh'],
+  'Porbandar': ['Porbandar', 'Kutiyana', 'Ranavav'],
 }
 
 const DISTRICTS = Object.keys(DISTRICT_TALUKAS).sort()
@@ -128,7 +128,6 @@ export default function TournamentPage() {
     if (!tournament) return
     const isFull = tournament.totalPlayersRequired > 0 && players.length >= tournament.totalPlayersRequired
     if (isFull) { toast.error('Player registrations are full!'); return }
-    if (tournament.entryFee > 0 && !paymentSS) { toast.error('Upload payment screenshot'); return }
     setSaving(true)
     try {
       let photoURL = ''
@@ -193,7 +192,7 @@ export default function TournamentPage() {
           <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur border border-white/30 rounded-xl px-5 py-2 mb-6">
             <span className="text-saffron-200 text-xs font-bold uppercase tracking-widest">Code:</span>
             <span className="text-2xl font-black tracking-widest">{code}</span>
-            <button onClick={copyCode} className="p-1 hover:bg-white/20 rounded-lg transition"><FiCopy size={14}/></button>
+            <button onClick={copyCode} className="p-1 hover:bg-white/20 rounded-lg transition"><FiCopy size={14} /></button>
           </div>
 
           <div className="mb-6">
@@ -220,17 +219,17 @@ export default function TournamentPage() {
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
           <button onClick={() => { if (!isFull) setShowForm(true); else toast.error('Registrations full!') }}
             className="card p-4 text-center hover:shadow-lg hover:-translate-y-0.5 transition-all border-2 border-blue-100 hover:border-blue-300">
-            <FiUsers className="mx-auto mb-1 text-blue-500" size={22}/>
+            <FiUsers className="mx-auto mb-1 text-blue-500" size={22} />
             <div className="font-bold text-sm text-stone-700">Register Player</div>
             <div className="text-xs text-stone-400">Add new player</div>
           </button>
           <Link href={`/t/${code}/teams`} className="card p-4 text-center hover:shadow-lg hover:-translate-y-0.5 transition-all border-2 border-green-100 hover:border-green-300">
-            <FiShield className="mx-auto mb-1 text-green-500" size={22}/>
+            <FiShield className="mx-auto mb-1 text-green-500" size={22} />
             <div className="font-bold text-sm text-stone-700">Register Team</div>
             <div className="text-xs text-stone-400">Add new team</div>
           </Link>
           <Link href={`/login`} className="card p-4 text-center hover:shadow-lg hover:-translate-y-0.5 transition-all border-2 border-saffron-100 hover:border-saffron-300">
-            <FiZap className="mx-auto mb-1 text-saffron-500" size={22}/>
+            <FiZap className="mx-auto mb-1 text-saffron-500" size={22} />
             <div className="font-bold text-sm text-stone-700">Live Auction</div>
             <div className="text-xs text-stone-400">Admin login</div>
           </Link>
@@ -251,7 +250,7 @@ export default function TournamentPage() {
                 <h3 className="font-extrabold text-xl text-stone-800">👤 Register as Player</h3>
                 <p className="text-xs text-stone-400 mt-0.5">Fill all required fields to complete registration</p>
               </div>
-              <button onClick={() => setShowForm(false)} className="p-2 text-stone-400 hover:bg-stone-100 rounded-lg"><FiX size={20}/></button>
+              <button onClick={() => setShowForm(false)} className="p-2 text-stone-400 hover:bg-stone-100 rounded-lg"><FiX size={20} /></button>
             </div>
 
             <div className="space-y-5">
@@ -260,15 +259,15 @@ export default function TournamentPage() {
                 <div onClick={() => document.getElementById('playerPhoto')?.click()}
                   className="w-20 h-20 rounded-2xl border-3 border-dashed border-blue-300 bg-blue-50 flex items-center justify-center overflow-hidden cursor-pointer hover:bg-blue-100 transition shrink-0 group">
                   {photoPreview
-                    ? <img src={photoPreview} className="w-full h-full object-cover"/>
-                    : <div className="text-center"><FiCamera className="mx-auto text-blue-400 group-hover:scale-110 transition" size={22}/><span className="text-[10px] text-blue-400 font-bold">Photo</span></div>}
+                    ? <img src={photoPreview} className="w-full h-full object-cover" />
+                    : <div className="text-center"><FiCamera className="mx-auto text-blue-400 group-hover:scale-110 transition" size={22} /><span className="text-[10px] text-blue-400 font-bold">Photo</span></div>}
                 </div>
                 <div>
                   <input id="playerPhoto" type="file" accept="image/*" className="hidden" onChange={e => {
                     const f = e.target.files?.[0]; if (f) { setPhoto(f); setPhotoPreview(URL.createObjectURL(f)) }
-                  }}/>
+                  }} />
                   <button onClick={() => document.getElementById('playerPhoto')?.click()} className="btn-outline btn-sm gap-1.5">
-                    <FiCamera size={14}/> {photoPreview ? 'Change Photo' : 'Upload Photo'}
+                    <FiCamera size={14} /> {photoPreview ? 'Change Photo' : 'Upload Photo'}
                   </button>
                   <p className="text-xs text-stone-400 mt-0.5">Player photo (recommended)</p>
                 </div>
@@ -278,11 +277,11 @@ export default function TournamentPage() {
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="label">First Name *</label>
-                  <input className="input" placeholder="e.g. Rohit" value={form.name} onChange={e => F('name', e.target.value)} autoFocus/>
+                  <input className="input" placeholder="e.g. Rohit" value={form.name} onChange={e => F('name', e.target.value)} autoFocus />
                 </div>
                 <div>
                   <label className="label">Surname *</label>
-                  <input className="input" placeholder="e.g. Patel" value={form.surname} onChange={e => F('surname', e.target.value)}/>
+                  <input className="input" placeholder="e.g. Patel" value={form.surname} onChange={e => F('surname', e.target.value)} />
                 </div>
               </div>
 
@@ -291,11 +290,11 @@ export default function TournamentPage() {
                 <div>
                   <label className="label">📱 Mobile Number *</label>
                   <input className="input" type="tel" maxLength={10} placeholder="9876543210" value={form.mobile}
-                    onChange={e => F('mobile', e.target.value.replace(/\D/g, '').slice(0, 10))}/>
+                    onChange={e => F('mobile', e.target.value.replace(/\D/g, '').slice(0, 10))} />
                 </div>
                 <div>
                   <label className="label">🎂 Date of Birth *</label>
-                  <input className="input" type="date" value={form.dob} onChange={e => F('dob', e.target.value)}/>
+                  <input className="input" type="date" value={form.dob} onChange={e => F('dob', e.target.value)} />
                 </div>
               </div>
 
@@ -346,7 +345,7 @@ export default function TournamentPage() {
                     <div className="bg-gradient-to-br from-green-50 to-blue-50 border-2 border-green-200 rounded-2xl p-4 text-center">
                       <p className="text-xs font-bold text-green-700 mb-2">📱 Scan to Pay via GPay / UPI</p>
                       {t.upiQrURL ? (
-                        <img src={t.upiQrURL} alt="UPI QR Code" className="w-40 h-40 mx-auto rounded-xl border-2 border-green-100 object-contain bg-white p-1"/>
+                        <img src={t.upiQrURL} alt="UPI QR Code" className="w-40 h-40 mx-auto rounded-xl border-2 border-green-100 object-contain bg-white p-1" />
                       ) : (
                         <div className="w-40 h-40 mx-auto rounded-xl border-2 border-green-100 bg-white flex items-center justify-center"><span className="text-stone-300 text-sm">QR not uploaded</span></div>
                       )}
@@ -359,14 +358,14 @@ export default function TournamentPage() {
                         className={`border-2 border-dashed rounded-2xl p-4 text-center cursor-pointer transition-all hover:bg-green-50
                           ${paymentPreview ? 'border-green-400 bg-green-50' : 'border-stone-300'}`}>
                         {paymentPreview ? (
-                          <div><img src={paymentPreview} className="w-full max-h-32 object-contain rounded-lg mx-auto"/><p className="text-xs text-green-600 font-bold mt-2">✅ Screenshot uploaded</p></div>
+                          <div><img src={paymentPreview} className="w-full max-h-32 object-contain rounded-lg mx-auto" /><p className="text-xs text-green-600 font-bold mt-2">✅ Screenshot uploaded</p></div>
                         ) : (
-                          <div><FiUpload className="mx-auto text-stone-400 mb-1" size={24}/><p className="text-xs text-stone-400 font-semibold">Tap to upload payment screenshot</p></div>
+                          <div><FiUpload className="mx-auto text-stone-400 mb-1" size={24} /><p className="text-xs text-stone-400 font-semibold">Tap to upload payment screenshot</p></div>
                         )}
                       </div>
                       <input id="paymentSS" type="file" accept="image/*" className="hidden" onChange={e => {
                         const f = e.target.files?.[0]; if (f) { setPaymentSS(f); setPaymentPreview(URL.createObjectURL(f)) }
-                      }}/>
+                      }} />
                     </div>
                   </div>
                 </div>
@@ -375,7 +374,7 @@ export default function TournamentPage() {
               {/* Submit */}
               <button onClick={handleRegister} disabled={saving}
                 className="btn-primary w-full py-3.5 text-base gap-2 mt-2">
-                {saving ? '⏳ Registering…' : <><FiPlus size={18}/> Register Player</>}
+                {saving ? '⏳ Registering…' : <><FiPlus size={18} /> Register Player</>}
               </button>
             </div>
           </div>
@@ -389,7 +388,7 @@ export default function TournamentPage() {
           {(t.groundName || t.groundLocation) && (
             <div className="card p-4 border-2 border-blue-100">
               <div className="flex items-start gap-3">
-                <FiMapPin className="text-blue-500 mt-0.5 shrink-0" size={18}/>
+                <FiMapPin className="text-blue-500 mt-0.5 shrink-0" size={18} />
                 <div>
                   <p className="text-xs text-stone-400 font-bold uppercase tracking-wider mb-1">Ground</p>
                   {t.groundName && <p className="font-bold text-stone-700">{t.groundName}</p>}
@@ -430,7 +429,7 @@ export default function TournamentPage() {
             </div>
             <div className="w-full bg-stone-100 rounded-full h-3">
               <div className={`h-3 rounded-full transition-all ${pct >= 100 ? 'bg-red-500' : 'bg-green-500'}`}
-                style={{ width: `${Math.min(100, pct)}%` }}/>
+                style={{ width: `${Math.min(100, pct)}%` }} />
             </div>
             <p className="text-xs text-stone-400 mt-1">{pct}% filled{pct >= 100 && ' · 🔒 Full'}</p>
           </div>
@@ -458,7 +457,7 @@ export default function TournamentPage() {
               {teams.map((tm, i) => (
                 <div key={tm.id} className={`card border-4 p-4 text-center hover:shadow-lg transition ${T_RING[i % 4]}`}>
                   <div className={`w-14 h-14 rounded-full mx-auto mb-2 border-4 overflow-hidden flex items-center justify-center font-extrabold text-xl ${T_RING[i % 4]}`}>
-                    {tm.logoURL ? <img src={tm.logoURL} className="w-full h-full object-cover rounded-full" alt={tm.teamName}/> : tm.teamName?.[0]?.toUpperCase()}
+                    {tm.logoURL ? <img src={tm.logoURL} className="w-full h-full object-cover rounded-full" alt={tm.teamName} /> : tm.teamName?.[0]?.toUpperCase()}
                   </div>
                   <div className="font-extrabold text-sm">{tm.teamName}</div>
                   <div className="text-xs text-stone-400">{tm.ownerName}</div>

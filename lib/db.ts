@@ -18,7 +18,7 @@ export interface Tournament {
 }
 export interface Player {
   id: string; name: string; surname: string; village: string; role: string
-  mobile: string; dob: string; district: string; taluka: string
+  mobile: string; dob: string; district: string; taluka: string; age?: string; address?: string
   photoURL: string; paymentScreenshotURL: string
   status: 'available' | 'sold' | 'unsold'
   soldTo?: string; soldToName?: string; soldPoints?: number
@@ -156,9 +156,23 @@ export const getTeamCount = async (tournamentId: string): Promise<number> => {
   const s = await getDocs(teamsCol(tournamentId))
   return s.size
 }
-export const addTeam = (d: Omit<Team, 'id' | 'points' | 'playersBought'>, tournamentId?: string) => {
+export const addTeam = async (d: Omit<Team, 'id' | 'points' | 'playersBought'>, tournamentId?: string) => {
+  // Get tournament settings to set initial team budget
+  let initialPoints = 0
+  if (tournamentId) {
+    try {
+      const settings = await getSettings(tournamentId)
+      initialPoints = settings.teamBudget || 500000
+    } catch (error) {
+      console.warn('Could not get tournament settings, using default budget')
+      initialPoints = 500000
+    }
+  } else {
+    initialPoints = 500000 // Default for global teams
+  }
+  
   const col = tournamentId ? teamsCol(tournamentId) : collection(db, 'teams')
-  return addDoc(col, { ...d, points: 0, playersBought: 0, createdAt: serverTimestamp() })
+  return addDoc(col, { ...d, points: initialPoints, playersBought: 0, createdAt: serverTimestamp() })
 }
 export const updateTeam = (id: string, d: any, tournamentId?: string) => {
   const path = tournamentId ? `tournaments/${tournamentId}/teams/${id}` : `teams/${id}`
@@ -238,4 +252,35 @@ export const resetTournament = async (tid?: string) => {
   teams.forEach(t => batch.update(doc(db, tBase, t.id), { points: 0, playersBought: 0 }))
   await batch.commit()
   await remove(ref(rtdb, tid ? `tournaments/${tid}` : 'auction'))
+}
+
+// ── REMOTE BIDDING FUNCTIONS ────────────────────────────────────────────────
+
+export const placeBid = async (tournamentId: string, teamId: string, points: number, teamName: string) => {
+  // Validate bid increment (must be in 5000 increments)
+  if (points % 5000 !== 0) {
+    throw new Error('Bid must be in 5000 increments')
+  }
+  
+  // Update live state with new bid
+  await updateLive({
+    currentPoints: points,
+    currentBidder: teamName,
+    currentBidderTeamId: teamId,
+    status: 'bidding'
+  }, tournamentId)
+  
+  // Add to bids history
+  await pushBid(teamId, teamName, points, tournamentId)
+}
+
+export const passBid = async (tournamentId: string, teamId: string, teamName: string) => {
+  // Add pass record to bids history
+  await push(ref(rtdb, `tournaments/${tournamentId}/bids`), { 
+    teamId, 
+    teamName, 
+    points: 0, 
+    pass: true,
+    ts: Date.now() 
+  })
 }

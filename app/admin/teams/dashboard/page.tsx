@@ -3,12 +3,14 @@ export const dynamic = 'force-dynamic'
 import { useEffect, useState } from 'react'
 import AdminLayout from '@/components/admin/AdminLayout'
 import { db } from '@/lib/firebase'
-import { collection, addDoc, getDocs, deleteDoc, doc, updateDoc, serverTimestamp } from 'firebase/firestore'
+import { collection, addDoc, getDocs, deleteDoc, doc, updateDoc, serverTimestamp, query, where } from 'firebase/firestore'
 import { uploadToCloudinary } from '@/lib/cloudinary'
-import { FiPlus, FiEdit2, FiTrash2, FiSearch, FiX, FiUpload } from 'react-icons/fi'
+import { FiPlus, FiEdit2, FiTrash2, FiSearch, FiX, FiUpload, FiCopy, FiExternalLink } from 'react-icons/fi'
 import toast from 'react-hot-toast'
+import { addTeam } from '@/lib/db'
 
 interface Team { id:string; teamName:string; ownerName:string; logoURL:string; points:number; playersBought:number }
+interface Tournament { id:string; name:string; status:string }
 const BLANK = { teamName:'', ownerName:'', logoURL:'' }
 
 export default function AdminTeamsPage() {
@@ -21,14 +23,44 @@ export default function AdminTeamsPage() {
   const [preview, setPreview] = useState('')
   const [saving,  setSaving]  = useState(false)
   const [search,  setSearch]  = useState('')
+  const [tournaments, setTournaments] = useState<Tournament[]>([])
+  const [selectedTournament, setSelectedTournament] = useState<string>('653')
 
   const load = async () => {
     setLoading(true)
-    const snap = await getDocs(collection(db, 'teams'))
-    setTeams(snap.docs.map(d => ({ id: d.id, ...d.data() } as Team)))
-    setLoading(false)
+    try {
+      console.log('Loading teams for tournament:', selectedTournament)
+      
+      // Load tournaments
+      const tournamentsSnap = await getDocs(collection(db, 'tournaments'))
+      const tournamentsList = tournamentsSnap.docs.map(d => ({ id: d.id, ...d.data() } as Tournament))
+      console.log('Tournaments loaded:', tournamentsList)
+      setTournaments(tournamentsList)
+      
+      // Load teams for selected tournament
+      if (selectedTournament) {
+        console.log('Loading tournament-specific teams for:', selectedTournament)
+        const teamsSnap = await getDocs(collection(db, 'tournaments', selectedTournament, 'teams'))
+        const teamsList = teamsSnap.docs.map(d => ({ id: d.id, ...d.data() } as Team))
+        console.log('Tournament teams loaded:', teamsList)
+        setTeams(teamsList)
+      } else {
+        console.log('Loading global teams')
+        // Fallback to global teams
+        const snap = await getDocs(collection(db, 'teams'))
+        const globalTeams = snap.docs.map(d => ({ id: d.id, ...d.data() } as Team))
+        console.log('Global teams loaded:', globalTeams)
+        setTeams(globalTeams)
+      }
+    } catch (error) {
+      console.error('Error loading data:', error)
+      toast.error('Failed to load teams')
+    } finally {
+      setLoading(false)
+    }
   }
-  useEffect(() => { load() }, [])
+  
+  useEffect(() => { load() }, [selectedTournament])
 
   const shown = teams.filter(t =>
     (t.teamName+' '+t.ownerName).toLowerCase().includes(search.toLowerCase())
@@ -41,27 +73,74 @@ export default function AdminTeamsPage() {
     if (!form.teamName.trim() || !form.ownerName.trim()) { toast.error('Team name and owner name are required'); return }
     setSaving(true)
     try {
+      console.log('Saving team:', { form, selectedTournament, editing })
+      
       let logoURL = form.logoURL
       if (logo) {
         logoURL = await uploadToCloudinary(logo, 'team-logos')
       }
       const data = { teamName: form.teamName.trim(), ownerName: form.ownerName.trim(), logoURL }
-      if (editing) {
-        await updateDoc(doc(db, 'teams', editing.id), data)
-        toast.success('Team updated!')
+      
+      if (selectedTournament) {
+        console.log('Saving to tournament:', selectedTournament)
+        // Save to tournament-specific collection
+        if (editing) {
+          console.log('Updating existing team in tournament')
+          await updateDoc(doc(db, 'tournaments', selectedTournament, 'teams', editing.id), data)
+          toast.success('Team updated in tournament!')
+        } else {
+          console.log('Adding new team to tournament')
+          const teamData = { teamName: form.teamName.trim(), ownerName: form.ownerName.trim(), logoURL }
+          console.log('Team data to save:', teamData)
+          const docRef = await addTeam(teamData, selectedTournament)
+          console.log('Team saved with ID:', docRef.id)
+          toast.success('Team added to tournament!')
+        }
       } else {
-        await addDoc(collection(db, 'teams'), { ...data, points:0, playersBought:0, createdAt: serverTimestamp() })
-        toast.success('Team added!')
+        console.log('Saving to global teams')
+        // Save to global teams collection
+        if (editing) {
+          await updateDoc(doc(db, 'teams', editing.id), data)
+          toast.success('Team updated!')
+        } else {
+          const teamData = { teamName: form.teamName.trim(), ownerName: form.ownerName.trim(), logoURL }
+          const docRef = await addTeam(teamData)
+          console.log('Global team saved with ID:', docRef.id)
+          toast.success('Team added!')
+        }
       }
-      setModal(false); load()
-    } catch (e: any) { toast.error(e.message) }
+      setModal(false); 
+      console.log('Reloading teams...')
+      load()
+    } catch (e: any) {
+      console.error('Error saving team:', e)
+      toast.error(e.message || 'Failed to save team')
+    }
     setSaving(false)
   }
 
   const handleDelete = async (id: string, name: string) => {
     if (!confirm(`Delete "${name}"?`)) return
-    await deleteDoc(doc(db, 'teams', id))
-    toast.success('Team deleted'); load()
+    try {
+      if (selectedTournament) {
+        await deleteDoc(doc(db, 'tournaments', selectedTournament, 'teams', id))
+        toast.success('Team deleted from tournament!')
+      } else {
+        await deleteDoc(doc(db, 'teams', id))
+        toast.success('Team deleted!')
+      }
+      load()
+    } catch (e: any) { toast.error(e.message) }
+  }
+
+  const copyTeamId = async (teamId: string) => {
+    await navigator.clipboard.writeText(teamId)
+    toast.success('Team ID copied!')
+  }
+
+  const openRemoteLink = (teamId: string) => {
+    const url = `${window.location.origin}/remote?teamId=${teamId}&tournamentId=653`
+    window.open(url, '_blank')
   }
 
   const TC = ['border-red-300 bg-red-50','border-blue-300 bg-blue-50','border-green-300 bg-green-50','border-purple-300 bg-purple-50']
@@ -75,6 +154,28 @@ export default function AdminTeamsPage() {
             <p className="text-stone-400 text-sm">{teams.length} teams · Admin can add unlimited teams</p>
           </div>
           <button onClick={openAdd} className="btn-primary gap-2"><FiPlus size={16}/> Add Team</button>
+        </div>
+
+        {/* Tournament Selector */}
+        <div className="bg-white rounded-xl shadow-lg p-4">
+          <div className="flex items-center gap-4">
+            <label className="text-sm font-medium text-gray-700">Select Tournament:</label>
+            <select
+              value={selectedTournament}
+              onChange={(e) => setSelectedTournament(e.target.value)}
+              className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-saffron-500 focus:border-transparent"
+            >
+              <option value="">Global Teams</option>
+              {tournaments.map(tournament => (
+                <option key={tournament.id} value={tournament.id}>
+                  {tournament.name} ({tournament.id})
+                </option>
+              ))}
+            </select>
+            <div className="text-sm text-gray-500">
+              {selectedTournament ? `Tournament: ${selectedTournament}` : 'Global Teams'}
+            </div>
+          </div>
         </div>
 
         {/* Search */}
@@ -101,9 +202,18 @@ export default function AdminTeamsPage() {
                 </div>
                 <div className="font-extrabold text-sm leading-tight">{t.teamName}</div>
                 <div className="text-xs text-stone-400 mt-0.5 font-medium">{t.ownerName}</div>
+                <div className="text-xs bg-saffron-100 text-saffron-700 px-2 py-1 rounded-full font-mono font-bold mt-1 flex items-center justify-center gap-1">
+                  ID: {t.id}
+                  <button onClick={() => copyTeamId(t.id)} className="hover:bg-saffron-200 rounded p-0.5 transition-colors" title="Copy Team ID">
+                    <FiCopy size={10}/>
+                  </button>
+                </div>
                 <div className="text-xs text-stone-500 font-semibold mt-1">{t.playersBought||0} players · {t.points||0} pts</div>
                 <div className="flex gap-1.5 mt-3 justify-center">
                   <button onClick={()=>openEdit(t)} className="p-1.5 text-stone-400 hover:text-saffron-500 hover:bg-saffron-50 rounded-lg transition-all"><FiEdit2 size={14}/></button>
+                  <button onClick={()=>openRemoteLink(t.id)} className="p-1.5 text-stone-400 hover:text-blue-500 hover:bg-blue-50 rounded-lg transition-all" title="Open Remote Bidding Link">
+                    <FiExternalLink size={14}/>
+                  </button>
                   <button onClick={()=>handleDelete(t.id, t.teamName)} className="p-1.5 text-stone-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all"><FiTrash2 size={14}/></button>
                 </div>
               </div>

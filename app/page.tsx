@@ -8,22 +8,22 @@ import SplashScreen from '@/components/SplashScreen'
 
 /* ── Countdown timer ── */
 function Countdown({ target }: { target: string }) {
-  const [t, setT] = useState({ d:0, h:0, m:0, s:0, done:false })
+  const [t, setT] = useState({ d: 0, h: 0, m: 0, s: 0, done: false })
   useEffect(() => {
     const tick = () => {
       const ms = new Date(target).getTime() - Date.now()
       if (ms <= 0) { setT(x => ({ ...x, done: true })); return }
-      setT({ d: Math.floor(ms/86400000), h: Math.floor(ms%86400000/3600000), m: Math.floor(ms%3600000/60000), s: Math.floor(ms%60000/1000), done: false })
+      setT({ d: Math.floor(ms / 86400000), h: Math.floor(ms % 86400000 / 3600000), m: Math.floor(ms % 3600000 / 60000), s: Math.floor(ms % 60000 / 1000), done: false })
     }
     tick(); const id = setInterval(tick, 1000); return () => clearInterval(id)
   }, [target])
   if (t.done) return <p className="text-saffron-200 font-bold text-lg tracking-wide">🏏 The Auction is LIVE now!</p>
   return (
     <div className="flex gap-3 justify-center">
-      {([['Days',t.d],['Hrs',t.h],['Min',t.m],['Sec',t.s]] as [string,number][]).map(([l,v]) => (
+      {([['Days', t.d], ['Hrs', t.h], ['Min', t.m], ['Sec', t.s]] as [string, number][]).map(([l, v]) => (
         <div key={l} className="text-center">
           <div className="bg-white/10 backdrop-blur border border-white/20 rounded-2xl px-4 py-3 min-w-[68px]">
-            <div className="text-4xl font-extrabold tabular-nums leading-none">{String(v).padStart(2,'0')}</div>
+            <div className="text-4xl font-extrabold tabular-nums leading-none">{String(v).padStart(2, '0')}</div>
           </div>
           <div className="text-saffron-200 text-xs font-bold mt-1.5 tracking-widest uppercase">{l}</div>
         </div>
@@ -42,7 +42,7 @@ function GavelOverlay({ show, onDone }: { show: boolean; onDone: () => void }) {
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center pointer-events-none">
       <div className="gavel-hit">
-        <img src="/gavel.png" alt="Gavel" className="w-24 h-24 sm:w-32 sm:h-32 drop-shadow-2xl object-contain"/>
+        <img src="/gavel.png" alt="Gavel" className="w-24 h-24 sm:w-32 sm:h-32 drop-shadow-2xl object-contain" />
       </div>
       <style>{`
         .gavel-hit {
@@ -69,15 +69,15 @@ function useGavel() {
 
 export default function Home() {
   const [settings, setSettings] = useState<any>({})
-  const [stats,    setStats]    = useState({ total:0, sold:0 })
+  const [stats, setStats] = useState({ total: 0, sold: 0 })
   const [tournaments, setTournaments] = useState<Tournament[]>([])
 
   const [showSplash, setShowSplash] = useState(true)
 
   useEffect(() => {
-    Promise.all([getSettings(), getPlayers(), getTournaments()]).then(([s,p,tr]) => {
+    Promise.all([getSettings(), getPlayers(), getTournaments()]).then(([s, p, tr]) => {
       setSettings(s); setTournaments(tr)
-      setStats({ total: p.length, sold: p.filter((x:any)=>x.status==='sold').length })
+      setStats({ total: p.length, sold: p.filter((x: any) => x.status === 'sold').length })
     })
   }, [])
 
@@ -106,12 +106,12 @@ export default function Home() {
             </div>
           </div>
           <nav className="hidden sm:flex items-center gap-1">
-            {[['#how','How It Works'],['#tournaments','Tournaments'],['#rules','Rules']].map(([h,l]) => (
+            {[['#how', 'How It Works'], ['#tournaments', 'Tournaments'], ['#rules', 'Rules']].map(([h, l]) => (
               <a key={h} href={h} className="px-3 py-1.5 text-sm font-semibold text-stone-500 hover:text-saffron-600 hover:bg-saffron-50 rounded-lg transition-all">{l}</a>
             ))}
           </nav>
           <Link href="/login" onClick={gavel.trigger} className="btn-primary btn-sm flex items-center gap-1.5">
-            <FiLogIn size={14}/> Login
+            <FiLogIn size={14} /> Login
           </Link>
         </div>
       </header>
@@ -123,7 +123,7 @@ export default function Home() {
           <img src="/hero-main.jpg" alt="Auction Hero" className="w-full h-full object-cover object-center" />
           <div className="absolute inset-0 bg-gradient-to-br from-stone-900/90 via-stone-900/40 to-stone-900/80" />
         </div>
-        <div className="absolute bottom-0 left-0 right-0 h-16 bg-stone-50" style={{clipPath:'ellipse(55% 100% at 50% 100%)'}} />
+        <div className="absolute bottom-0 left-0 right-0 h-16 bg-stone-50" style={{ clipPath: 'ellipse(55% 100% at 50% 100%)' }} />
 
         <div className="relative z-10 max-w-5xl mx-auto px-4 py-20 sm:py-24 text-white text-center">
           <div className="inline-flex items-center gap-2 border border-white/20 bg-white/5 backdrop-blur-md rounded-full px-5 py-2 text-xs font-bold tracking-[0.2em] uppercase mb-8 text-saffron-300 shadow-xl">
@@ -135,21 +135,21 @@ export default function Home() {
           </h1>
 
           <p className="max-w-3xl mx-auto text-stone-200 text-base sm:text-lg mb-10 leading-relaxed font-medium drop-shadow-md">
-            Cricket Auction Hub is India’s most trusted digital platform designed specifically for cricket. 
-            We’ve removed the clutter of other sports to focus 100% on the gentleman's game. 
+            Cricket Auction Hub is India’s most trusted digital platform designed specifically for cricket.
+            We’ve removed the clutter of other sports to focus 100% on the gentleman's game.
             From local club leagues to massive corporate tournaments, manage your player bidding with professional-grade tools.
           </p>
 
           {settings.auctionDate && (
             <p className="text-saffron-100 text-sm font-semibold mb-8 tracking-wide">
-              📅 {new Date(settings.auctionDate).toLocaleDateString('en-IN', { weekday:'long', day:'numeric', month:'long', year:'numeric' })}
+              📅 {new Date(settings.auctionDate).toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
             </p>
           )}
 
           {settings.auctionDate && (
             <div className="mb-10">
               <p className="text-saffron-200 text-xs font-bold tracking-widest uppercase mb-4">⏱ Auction Begins In</p>
-              <Countdown target={settings.auctionDate}/>
+              <Countdown target={settings.auctionDate} />
             </div>
           )}
 
@@ -180,7 +180,7 @@ export default function Home() {
       {/* ── Stats strip ─────────────────────────────────────────────── */}
       <section className="bg-white border-b border-stone-200 py-5">
         <div className="max-w-3xl mx-auto px-4 grid grid-cols-3 gap-4 text-center">
-          {[['👤',stats.total,'Players'],['🏆',stats.sold,'Sold'],['🏆',tournaments.length,'Tournaments']].map(([ic,v,l]) => (
+          {[['👤', stats.total, 'Players'], ['🏆', stats.sold, 'Sold'], ['🏆', tournaments.length, 'Tournaments']].map(([ic, v, l]) => (
             <div key={l as string} className="flex flex-col items-center">
               <span className="text-2xl mb-0.5">{ic}</span>
               <span className="text-2xl font-extrabold text-stone-800">{v}</span>
@@ -201,9 +201,9 @@ export default function Home() {
           </div>
           <div className="grid sm:grid-cols-3 gap-5">
             {[
-              { n:'01', e:'📋', t:'Admin Puts Player', d:'Tournament admin calls each player for auction. Player photo, name and role shows on all screens.' },
-              { n:'02', e:<img src="/icon.png" className="w-6 h-6 object-contain inline-block" />, t:'Teams Bid Points',  d:'4 teams click their bid buttons. Points increase with each bid. Highest bidder leads the auction.' },
-              { n:'03', e:'🏆', t:'SOLD! Celebrate!',  d:'Timer ends. Player is SOLD to the highest bidding team. Confetti celebration! PDF report generated.' },
+              { n: '01', e: '📋', t: 'Admin Puts Player', d: 'Tournament admin calls each player for auction. Player photo, name and role shows on all screens.' },
+              { n: '02', e: <img src="/icon.png" className="w-6 h-6 object-contain inline-block" />, t: 'Teams Bid Points', d: '4 teams click their bid buttons. Points increase with each bid. Highest bidder leads the auction.' },
+              { n: '03', e: '🏆', t: 'SOLD! Celebrate!', d: 'Timer ends. Player is SOLD to the highest bidding team. Confetti celebration! PDF report generated.' },
             ].map(s => (
               <div key={s.n} className="bg-saffron-50 border-2 border-saffron-100 rounded-2xl p-6 text-center">
                 <div className="text-5xl mb-3">{s.e}</div>
@@ -217,6 +217,101 @@ export default function Home() {
         </div>
       </section>
 
+      {/* ── Pricing ─────────────────────────────────────────────────── */}
+      <section className="py-20 px-4 bg-[#0d1117]">
+        <div className="max-w-5xl mx-auto">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl sm:text-4xl font-black text-white mb-3">
+              Transparent <span className="text-saffron-400">Per Team Pricing</span>
+            </h2>
+            <p className="text-stone-400 text-sm">No hidden charges. Scale your league as you grow.</p>
+          </div>
+
+          <div className="grid sm:grid-cols-3 gap-6">
+            {/* Quick League */}
+            <div className="relative bg-[#161b22] border border-stone-700 rounded-2xl p-7 flex flex-col hover:border-saffron-400/50 hover:shadow-xl hover:shadow-saffron-400/10 transition-all group">
+              <div className="absolute -top-3 left-1/2 -translate-x-1/2">
+                <span className="bg-saffron-400 text-stone-900 text-xs font-extrabold px-4 py-1 rounded-full whitespace-nowrap">Limited Time – Free</span>
+              </div>
+              <h3 className="text-white text-xl font-extrabold mt-3 mb-1">Quick League</h3>
+              <p className="text-saffron-400 text-sm font-semibold mb-5">Up to 4 Teams</p>
+              <div className="flex items-end gap-1 mb-7">
+                <span className="text-5xl font-black text-saffron-400">₹0</span>
+                <span className="text-stone-400 text-sm mb-1">/ free</span>
+              </div>
+              <Link href="/register-tournament"
+                className="mt-auto block text-center bg-gradient-to-r from-saffron-500 to-orange-500 text-white font-extrabold py-3 rounded-xl hover:opacity-90 hover:scale-[1.02] transition-all active:scale-95">
+                Start Free League
+              </Link>
+            </div>
+
+            {/* Standard League */}
+            <div className="relative bg-[#161b22] border border-stone-700 rounded-2xl p-7 flex flex-col hover:border-saffron-400/50 hover:shadow-xl hover:shadow-saffron-400/10 transition-all group">
+              <h3 className="text-white text-xl font-extrabold mb-1">Standard League</h3>
+              <p className="text-saffron-400 text-sm font-semibold mb-5">Up to 8 Teams</p>
+              <div className="flex items-end gap-1 mb-7">
+                <span className="text-5xl font-black text-saffron-400">₹400</span>
+                <span className="text-stone-400 text-sm mb-1">/ per team</span>
+              </div>
+              <Link href="/register-tournament"
+                className="mt-auto block text-center bg-gradient-to-r from-saffron-500 to-orange-500 text-white font-extrabold py-3 rounded-xl hover:opacity-90 hover:scale-[1.02] transition-all active:scale-95">
+                Launch League
+              </Link>
+            </div>
+
+            {/* Bulk League */}
+            <div className="relative bg-[#161b22] border-2 border-saffron-500/60 rounded-2xl p-7 flex flex-col hover:border-saffron-400 hover:shadow-xl hover:shadow-saffron-400/20 transition-all group">
+              <div className="absolute -top-3 left-1/2 -translate-x-1/2">
+                <span className="bg-saffron-500 text-white text-xs font-extrabold px-4 py-1 rounded-full whitespace-nowrap">Most Popular</span>
+              </div>
+              <h3 className="text-white text-xl font-extrabold mt-3 mb-1">Bulk League</h3>
+              <p className="text-saffron-400 text-sm font-semibold mb-5">Above 8 Teams</p>
+              <div className="flex items-end gap-1 mb-7">
+                <span className="text-5xl font-black text-saffron-400">₹300</span>
+                <span className="text-stone-400 text-sm mb-1">/ per team</span>
+              </div>
+              <Link href="/register-tournament"
+                className="mt-auto block text-center bg-gradient-to-r from-saffron-500 to-orange-500 text-white font-extrabold py-3 rounded-xl hover:opacity-90 hover:scale-[1.02] transition-all active:scale-95">
+                Get Bulk Pricing
+              </Link>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ── Powerful Auction Features ──────────────────────────────── */}
+      <section className="py-20 px-4 bg-[#0d1117]">
+        <div className="max-w-5xl mx-auto">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl sm:text-4xl font-black text-white mb-3">
+              Powerful <span className="text-saffron-400">Auction Features</span>
+            </h2>
+            <p className="text-stone-400 text-sm max-w-md mx-auto">Built for leagues that want performance, control, and a premium auction experience.</p>
+          </div>
+
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
+            {[
+              { icon: '📡', title: 'Live Player Auction', desc: 'Real-time bidding engine with instant updates and smooth transitions.', href: '/login' },
+              { icon: '👥', title: 'Team Management', desc: 'Control team budgets, squad size, purse limits and auction rules.', href: '/login' },
+              { icon: '⚡', title: 'Real-Time Updates', desc: 'All devices stay synchronized during live bidding sessions.', href: '/login' },
+              { icon: '🎛️', title: 'Customizable Bidding Rules', desc: 'Define auction logic, increments, and player category pricing.', href: '/login' },
+              { icon: '📱', title: 'Multi-Platform Accessibility', desc: 'Optimized for desktop, tablet and mobile devices.', href: '/login' },
+              { icon: '▶️', title: 'YouTube Live Overlay', desc: 'Broadcast live auction graphics on streaming platforms.', href: '/login' },
+            ].map(f => (
+              <Link key={f.title} href={f.href}
+                className="bg-[#161b22] border border-stone-700 rounded-2xl p-6 flex flex-col gap-4 hover:border-saffron-400/50 hover:shadow-lg hover:shadow-saffron-400/10 hover:-translate-y-1 transition-all group cursor-pointer">
+                <div className="w-14 h-14 bg-gradient-to-br from-saffron-400 to-orange-500 rounded-2xl flex items-center justify-center text-2xl shadow-lg group-hover:scale-110 transition-transform">
+                  {f.icon}
+                </div>
+                <div>
+                  <h3 className="text-white font-extrabold text-base mb-1 group-hover:text-saffron-400 transition-colors">{f.title}</h3>
+                  <p className="text-stone-400 text-sm leading-relaxed">{f.desc}</p>
+                </div>
+              </Link>
+            ))}
+          </div>
+        </div>
+      </section>
 
 
 
@@ -251,7 +346,7 @@ export default function Home() {
                       {/* Logo + Name */}
                       <div className="flex items-start gap-4 mb-4">
                         <div className="w-16 h-16 rounded-xl border-2 border-saffron-100 bg-saffron-50 flex items-center justify-center overflow-hidden shrink-0">
-                          {t.logoURL ? <img src={t.logoURL} className="w-full h-full object-cover" alt={t.name}/> : <span className="text-3xl">🏆</span>}
+                          {t.logoURL ? <img src={t.logoURL} className="w-full h-full object-cover" alt={t.name} /> : <span className="text-3xl">🏆</span>}
                         </div>
                         <div className="flex-1 min-w-0">
                           <h3 className="font-extrabold text-lg leading-tight">{t.name}</h3>
@@ -284,7 +379,7 @@ export default function Home() {
                         <div className="mb-3">
                           <div className="w-full bg-stone-100 rounded-full h-2.5">
                             <div className={`h-2.5 rounded-full transition-all ${full ? 'bg-red-500' : 'bg-green-500'}`}
-                              style={{ width: `${Math.min(100, pct)}%` }}/>
+                              style={{ width: `${Math.min(100, pct)}%` }} />
                           </div>
                           <p className="text-[11px] text-stone-400 mt-1 font-medium">
                             {pct}% filled{full && ' · 🔒 Registrations Full'}
@@ -295,7 +390,7 @@ export default function Home() {
                       {/* Ground & location */}
                       {(t.groundName || t.groundLocation) && (
                         <div className="bg-blue-50 rounded-xl p-3 mb-2 flex items-start gap-2">
-                          <FiMapPin size={14} className="text-blue-500 mt-0.5 shrink-0"/>
+                          <FiMapPin size={14} className="text-blue-500 mt-0.5 shrink-0" />
                           <div>
                             {t.groundName && <div className="text-xs font-bold text-blue-700">{t.groundName}</div>}
                             {t.groundLocation && <div className="text-[11px] text-blue-500">{t.groundLocation}</div>}
@@ -342,7 +437,7 @@ export default function Home() {
               '⏱️ Highest bid wins when timer expires',
               '❌ Unsold players can be re-auctioned',
               '📄 PDF squad report after auction ends',
-            ].map((r,i) => (
+            ].map((r, i) => (
               <div key={i} className="flex items-center gap-2.5 bg-white border-2 border-stone-100 rounded-xl px-4 py-3 text-sm font-medium text-stone-600 hover:border-saffron-200 hover:bg-saffron-50 transition-all">
                 {r}
               </div>
@@ -372,11 +467,11 @@ export default function Home() {
           <div className="flex items-center justify-center gap-6 mt-4">
             <a href="https://instagram.com/kunallll2303" target="_blank" rel="noreferrer"
               className="flex items-center gap-1.5 text-stone-500 hover:text-saffron-400 transition-colors text-sm">
-              <FiInstagram size={14}/> @kunallll2303
+              <FiInstagram size={14} /> @kunallll2303
             </a>
             <a href="https://instagram.com/yash_jani_" target="_blank" rel="noreferrer"
               className="flex items-center gap-1.5 text-stone-500 hover:text-blue-400 transition-colors text-sm">
-              <FiInstagram size={14}/> @yash_jani_
+              <FiInstagram size={14} /> @yash_jani_
             </a>
           </div>
           <p className="text-xs text-stone-600 mt-4">© 2026 PlayerAuctionHub. All rights reserved.</p>

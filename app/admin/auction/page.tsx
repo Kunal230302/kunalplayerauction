@@ -22,7 +22,7 @@ const TEAM_CLASSES = [
 // Inner component uses useSearchParams — must be inside Suspense
 function LiveAuctionInner() {
   const searchParams = useSearchParams()
-  const tournamentId = searchParams.get('tournamentId') || ''
+  const tournamentId = searchParams.get('tournamentId') || '653' // Default to 653
 
   const [players,  setPlayers]  = useState<any[]>([])
   const [teams,    setTeams]    = useState<any[]>([])
@@ -214,6 +214,90 @@ function LiveAuctionInner() {
     setGenPdf(false)
   }
 
+  /* ── Remote Bidding Simulator Functions ── */
+  const simulateRemoteBid = async (teamId: string, teamName: string, customAmount?: number) => {
+    if (!live) {
+      toast.error('No active auction to bid on!')
+      return
+    }
+
+    try {
+      // Use proper bid increment: 5000 increments as requested
+      const bidAmount = customAmount || (live.currentPoints + 5000)
+      
+      // Update live state with new bid
+      await updateLive({
+        ...live,
+        currentPoints: bidAmount,
+        currentBidder: teamName,
+        currentBidderTeamId: teamId,
+        status: 'bidding'
+      }, tournamentId || undefined)
+
+      // Add to bid history
+      await pushBid(teamId, teamName, bidAmount, tournamentId || undefined)
+      
+      toast.success(`📱 Remote bid: ${teamName} - ${bidAmount} pts`)
+    } catch (error: any) {
+      toast.error(`Remote bid failed: ${error.message}`)
+    }
+  }
+
+  const simulatePass = async () => {
+    if (!live) {
+      toast.error('No active auction!')
+      return
+    }
+
+    try {
+      // Add pass record to bid history
+      const { ref, push } = await import('firebase/database')
+      const { rtdb } = await import('@/lib/firebase')
+      const bidsPath = tournamentId ? `tournaments/${tournamentId}/bids` : 'auction/bids'
+      
+      await push(ref(rtdb, bidsPath), {
+        teamId: 'remote-pass',
+        teamName: 'Remote Pass',
+        points: 0,
+        pass: true,
+        ts: Date.now()
+      })
+
+      toast.success('📱 Remote pass recorded!')
+    } catch (error: any) {
+      toast.error(`Remote pass failed: ${error.message}`)
+    }
+  }
+
+  const createTestAuction = async () => {
+    try {
+      const testPlayer = players[0] || {
+        id: 'test123',
+        name: 'Test Player',
+        role: 'Batsman',
+        village: 'Test Village'
+      }
+
+      const testData = {
+        playerId: testPlayer.id,
+        playerName: testPlayer.name,
+        playerRole: testPlayer.role,
+        playerPhoto: testPlayer.photoURL || '',
+        playerVillage: testPlayer.village || '',
+        currentPoints: settings.basePrice || 5000,
+        currentBidder: 'Waiting for bid...',
+        currentBidderTeamId: '',
+        status: 'bidding',
+        timerEnd: Date.now() + 30000
+      }
+
+      await setLive(testData, tournamentId || undefined)
+      toast.success('🎯 Test auction created! Remote interface should now work.')
+    } catch (error: any) {
+      toast.error(`Test auction failed: ${error.message}`)
+    }
+  }
+
   /* ── Derived ── */
   const currentPlayer = queue[qIdx]
   const timerPct      = settings.timerSeconds ? (timer / settings.timerSeconds) * 100 : 0
@@ -250,6 +334,9 @@ function LiveAuctionInner() {
                 🏆 {tournamentName}
               </span>
             )}
+            <span className="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-xs font-bold border border-blue-200">
+              📋 Tournament ID: {tournamentId}
+            </span>
             {!tournamentId && (
               <span className="bg-red-50 text-red-600 px-3 py-1 rounded-full text-xs font-bold border border-red-200">
                 ⚠️ No tournament selected — Go to Tournaments → Start Auction
@@ -473,6 +560,87 @@ function LiveAuctionInner() {
                     </div>
                   </div>
                 ))}
+              </div>
+            </div>
+
+            {/* Remote Bidding Simulator */}
+            <div className="card overflow-hidden">
+              <div className="px-4 py-3 border-b-2 border-stone-100 bg-gradient-to-r from-blue-50 to-purple-50">
+                <h3 className="font-extrabold text-sm text-stone-700 flex items-center gap-2">
+                  📱 Remote Bidding Simulator
+                </h3>
+              </div>
+              <div className="p-4 space-y-3">
+                <div className="text-xs text-gray-600">
+                  Test remote bidding functionality from admin panel
+                </div>
+                
+                {/* Team Selection */}
+                <div className="grid grid-cols-2 gap-2">
+                  {teams.slice(0, 4).map((team: any, i: number) => (
+                    <button
+                      key={team.id}
+                      onClick={() => simulateRemoteBid(team.id, team.teamName)}
+                      className="bg-gradient-to-r from-saffron-500 to-orange-500 text-white p-2 rounded-lg text-xs font-bold hover:from-saffron-600 hover:to-orange-600 transition-all"
+                    >
+                      📱 {team.teamName}
+                    </button>
+                  ))}
+                </div>
+
+                {/* Custom Bid */}
+                <div className="flex gap-2">
+                  <input
+                    type="number"
+                    placeholder="Custom bid amount"
+                    className="flex-1 px-2 py-1 text-xs border rounded"
+                    id="customBidAmount"
+                  />
+                  <button
+                    onClick={() => {
+                      const amount = (document.getElementById('customBidAmount') as HTMLInputElement)?.value
+                      if (amount && teams[0]) {
+                        simulateRemoteBid(teams[0].id, teams[0].teamName, parseInt(amount))
+                      }
+                    }}
+                    className="bg-blue-500 text-white px-3 py-1 rounded text-xs font-bold"
+                  >
+                    Custom Bid
+                  </button>
+                </div>
+
+                {/* Quick Actions */}
+                <div className="flex gap-2">
+                  <button
+                    onClick={simulatePass}
+                    className="bg-gray-500 text-white px-3 py-1 rounded text-xs font-bold"
+                  >
+                    ❌ Pass
+                  </button>
+                  <button
+                    onClick={createTestAuction}
+                    className="bg-green-500 text-white px-3 py-1 rounded text-xs font-bold"
+                  >
+                    🎯 Create Test
+                  </button>
+                  <button
+                    onClick={() => window.open('/remote?teamId=AUzkuHdcUyw8B7ohgc2L&tournamentId=653', '_blank')}
+                    className="bg-purple-500 text-white px-3 py-1 rounded text-xs font-bold"
+                  >
+                    📱 Open Remote
+                  </button>
+                </div>
+
+                {/* Status */}
+                <div className="bg-gray-50 p-2 rounded text-xs">
+                  <div className="font-bold mb-1">Status:</div>
+                  <div className="space-y-1">
+                    <div>Live Data: {live ? '✅' : '❌'}</div>
+                    <div>Current Player: {live?.playerName || 'None'}</div>
+                    <div>Current Bid: {live?.currentPoints || 0}</div>
+                    <div>Status: {live?.status || 'None'}</div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>

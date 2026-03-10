@@ -3,9 +3,16 @@ export const dynamic = 'force-dynamic'
 import { useEffect, useState } from 'react'
 import { subLive, LiveState, getTeams } from '@/lib/db'
 
-// YouTube Live Overlay — full-width branded overlay for YouTube Live streaming
+// YouTube Live Stream Overlay — Compact branded overlay for live streaming
 // URL: yoursite.com/overlay/youtube
-// Use as a Browser Source in OBS at 1920x1080
+// Use as Browser Source in OBS at 1920x1080 or direct browser streaming
+//
+// 🎥 LIVE STREAMING INSTRUCTIONS:
+// 💻 PC/Mac: OBS Studio → Browser Source → URL: yourdomain.com/overlay/youtube
+// 📱 Mobile: Phone browser → Full screen → Start live stream on YouTube/TikTok/Instagram
+// 🍎 iOS: Safari → Full screen → Go Live on YouTube/Facebook/Twitch from mobile
+// 📲 Android: Chrome → Full screen → Stream directly to YouTube Live or other platforms
+// 🎯 Perfect for: Mobile streaming, vertical video, social media live streams
 
 export default function YouTubeOverlay() {
   const [live, setLive] = useState<LiveState | null>(null)

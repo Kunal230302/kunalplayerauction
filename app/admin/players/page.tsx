@@ -3,8 +3,10 @@ export const dynamic = 'force-dynamic'
 import { useEffect, useState, useCallback } from 'react'
 import AdminLayout from '@/components/admin/AdminLayout'
 import { getTournaments, getPlayers, deletePlayer, Tournament, Player } from '@/lib/db'
-import { FiTrash2, FiSearch, FiX, FiImage, FiRefreshCw } from 'react-icons/fi'
+import { FiTrash2, FiSearch, FiX, FiImage, FiRefreshCw, FiDownload, FiFileText } from 'react-icons/fi'
 import toast from 'react-hot-toast'
+import jsPDF from 'jspdf'
+import autoTable from 'jspdf-autotable'
 
 const ROLES = ['Batsman','Bowler','All-Rounder','Wicket-Keeper']
 const S_BADGE: Record<string,string> = { available:'b-gray', sold:'b-green', unsold:'b-red' }
@@ -48,6 +50,251 @@ export default function PlayersPage() {
     await deletePlayer(id, selectedTournament); toast.success('Deleted'); load()
   }
 
+  const downloadPlayerList = () => {
+    // Create CSV content with all details (excluding status)
+    const headers = ['Name', 'Surname', 'Role', 'Village', 'Address', 'Mobile', 'Age', 'Sold To', 'Sold Points']
+    const csvContent = [
+      headers.join(','),
+      ...shown.map(player => [
+        `"${player.name || ''}"`,
+        `"${player.surname || ''}"`,
+        `"${player.role || ''}"`,
+        `"${player.village || ''}"`,
+        `"${player.address || ''}"`,
+        `"${player.mobile || ''}"`,
+        `"${player.age || ''}"`,
+        `"${player.soldToName || ''}"`,
+        `"${player.soldPoints || ''}"`
+      ].join(','))
+    ].join('\n')
+
+    // Create download link
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' })
+    const link = document.createElement('a')
+    const url = URL.createObjectURL(blob)
+    link.setAttribute('href', url)
+    link.setAttribute('download', `players_${currentTournament?.name || 'tournament'}_${new Date().toISOString().split('T')[0]}.csv`)
+    link.style.visibility = 'hidden'
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+    
+    toast.success(`Downloaded ${shown.length} players (CSV)`)
+  }
+
+  const downloadPlayerPDF = async () => {
+    try {
+      const doc = new jsPDF()
+      
+      // Add title
+      doc.setFontSize(20)
+      doc.text(`Player List - ${currentTournament?.name || 'Tournament'}`, 14, 15)
+      doc.setFontSize(12)
+      doc.text(`Generated: ${new Date().toLocaleDateString()}`, 14, 25)
+      doc.text(`Total Players: ${shown.length}`, 14, 32)
+      
+      // Prepare table data (excluding status)
+      const tableData = shown.map((player, index) => [
+        index + 1,
+        player.name || '',
+        player.surname || '',
+        player.role || '',
+        player.age || '',
+        player.village || '',
+        player.address || '',
+        player.mobile || '',
+        player.soldToName || '',
+        player.soldPoints || ''
+      ])
+      
+      // Add table
+      autoTable(doc, {
+        head: [['#', 'Name', 'Surname', 'Role', 'Age', 'Village', 'Address', 'Mobile', 'Sold To', 'Points']],
+        body: tableData,
+        startY: 40,
+        styles: {
+          fontSize: 8,
+          cellPadding: 2,
+        },
+        headStyles: {
+          fillColor: [255, 140, 0], // Saffron color
+          textColor: 255,
+          fontSize: 9,
+          fontStyle: 'bold'
+        },
+        alternateRowStyles: {
+          fillColor: [245, 245, 245]
+        },
+        columnStyles: {
+          0: { cellWidth: 15 }, // #
+          1: { cellWidth: 25 }, // Name
+          2: { cellWidth: 25 }, // Surname
+          3: { cellWidth: 20 }, // Role
+          4: { cellWidth: 15 }, // Age
+          5: { cellWidth: 30 }, // Village
+          6: { cellWidth: 35 }, // Address
+          7: { cellWidth: 25 }, // Mobile
+          8: { cellWidth: 20 }, // Status
+          9: { cellWidth: 30 }, // Sold To
+          10: { cellWidth: 20 }  // Points
+        }
+      })
+      
+      // Save PDF
+      doc.save(`players_${currentTournament?.name || 'tournament'}_${new Date().toISOString().split('T')[0]}.pdf`)
+      toast.success(`Downloaded ${shown.length} players (PDF)`)
+      
+    } catch (error) {
+      console.error('PDF generation error:', error)
+      toast.error('Failed to generate PDF')
+    }
+  }
+
+  const downloadPlayerPDFWithPhotos = async () => {
+    try {
+      const doc = new jsPDF()
+      
+      // Add header with tournament logo and name
+      if (currentTournament?.logoURL) {
+        try {
+          // Add tournament logo on the left
+          const img = new Image()
+          img.crossOrigin = 'anonymous'
+          
+          await new Promise((resolve, reject) => {
+            img.onload = resolve
+            img.onerror = reject
+            img.src = currentTournament.logoURL
+          })
+          
+          doc.addImage(img, 'JPEG', 20, 10, 30, 30)
+          
+          // Add tournament name in the middle
+          doc.setFontSize(18)
+          doc.setTextColor(255, 140, 0) // Saffron color
+          doc.text(currentTournament.name, 105, 25, { align: 'center' })
+        } catch (error) {
+          console.log('Could not load tournament logo')
+          // Fallback: just tournament name centered
+          doc.setFontSize(20)
+          doc.setTextColor(255, 140, 0)
+          doc.text(currentTournament?.name || 'Tournament', 105, 20, { align: 'center' })
+        }
+      } else {
+        // No logo, just tournament name centered
+        doc.setFontSize(20)
+        doc.setTextColor(255, 140, 0)
+        doc.text(currentTournament?.name || 'Tournament', 105, 20, { align: 'center' })
+      }
+      
+      // Add subtitle
+      doc.setFontSize(12)
+      doc.setTextColor(100, 100, 100)
+      doc.text(`Player Profiles - ${new Date().toLocaleDateString()}`, 105, 35, { align: 'center' })
+      doc.text(`Total Players: ${shown.length}`, 105, 42, { align: 'center' })
+      
+      // Add separator line
+      doc.setDrawColor(200, 200, 200)
+      doc.line(20, 48, 190, 48)
+      
+      let yPosition = 55
+      
+      for (let i = 0; i < shown.length; i++) {
+        const player = shown[i]
+        
+        // Check if we need a new page
+        if (yPosition > 250) {
+          doc.addPage()
+          yPosition = 20
+        }
+        
+        // Player number starting from 1
+        doc.setFontSize(14)
+        doc.setTextColor(255, 140, 0) // Saffron color
+        doc.text(`${i + 1}. ${player.name} ${player.surname}`, 20, yPosition)
+        
+        yPosition += 12
+        
+        // Player details
+        doc.setFontSize(10)
+        doc.setTextColor(0, 0, 0) // Black color
+        
+        const details = [
+          `Role: ${player.role || ''}`,
+          `Age: ${player.age || ''}`,
+          `Village: ${player.village || ''}`,
+          `Address: ${player.address || ''}`,
+          `Mobile: ${player.mobile || ''}`,
+          `Sold To: ${player.soldToName || 'Not Sold'}`,
+          `Sold Points: ${player.soldPoints || '0'}`
+        ]
+        
+        details.forEach(detail => {
+          doc.text(detail, 25, yPosition)
+          yPosition += 6
+        })
+        
+        // Add photo if available
+        if (player.photoURL) {
+          try {
+            const img = new Image()
+            img.crossOrigin = 'anonymous'
+            
+            await new Promise((resolve, reject) => {
+              img.onload = resolve
+              img.onerror = reject
+              img.src = player.photoURL
+            })
+            
+            // Add photo to the right side
+            if (yPosition > 180) {
+              doc.addPage()
+              yPosition = 40
+            }
+            
+            // Add photo with border
+            doc.setDrawColor(150, 150, 150)
+            doc.rect(140, yPosition - 50, 40, 40)
+            doc.addImage(img, 'JPEG', 140, yPosition - 50, 40, 40)
+          } catch (error) {
+            console.log('Could not load photo for player:', player.name)
+            // Add placeholder box
+            doc.setDrawColor(200, 200, 200)
+            doc.rect(140, yPosition - 50, 40, 40)
+            doc.setFontSize(8)
+            doc.setTextColor(150, 150, 150)
+            doc.text('No Photo', 160, yPosition - 30, { align: 'center' })
+          }
+        }
+        
+        yPosition += 25
+        
+        // Add separator line between players
+        doc.setDrawColor(220, 220, 220)
+        doc.line(20, yPosition, 190, yPosition)
+        yPosition += 15
+      }
+      
+      // Add footer
+      const pageCount = doc.internal.pages.length
+      for (let i = 1; i <= pageCount; i++) {
+        doc.setPage(i)
+        doc.setFontSize(8)
+        doc.setTextColor(150, 150, 150)
+        doc.text(`Page ${i} of ${pageCount}`, 105, 285, { align: 'center' })
+        doc.text(`Generated on ${new Date().toLocaleString()}`, 105, 290, { align: 'center' })
+      }
+      
+      // Save PDF
+      doc.save(`player_profiles_${currentTournament?.name || 'tournament'}_${new Date().toISOString().split('T')[0]}.pdf`)
+      toast.success(`Downloaded ${shown.length} player profiles with photos (PDF)`)
+      
+    } catch (error) {
+      console.error('PDF with photos generation error:', error)
+      toast.error('Failed to generate PDF with photos')
+    }
+  }
+
   const currentTournament = tournaments.find(t => t.id === selectedTournament)
 
   return (
@@ -58,9 +305,27 @@ export default function PlayersPage() {
             <h1 className="page-title">Players</h1>
             <p className="text-stone-400 text-sm">{players.length} total · {players.filter(p=>p.status==='available').length} available</p>
           </div>
-          <button onClick={() => load()} className="btn-outline gap-2 flex items-center">
-            <FiRefreshCw size={15}/> Refresh
-          </button>
+          <div className="flex gap-2">
+            <div className="relative group">
+              <button className="btn-primary gap-2 flex items-center">
+                <FiDownload size={15}/> Download
+              </button>
+              <div className="absolute top-full mt-1 right-0 bg-white border border-gray-200 rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50 min-w-[200px]">
+                <button onClick={downloadPlayerList} className="w-full text-left px-4 py-2 hover:bg-gray-100 flex items-center gap-2 text-sm">
+                  <FiDownload size={14}/> Download CSV
+                </button>
+                <button onClick={downloadPlayerPDF} className="w-full text-left px-4 py-2 hover:bg-gray-100 flex items-center gap-2 text-sm">
+                  <FiFileText size={14}/> Download PDF (Table)
+                </button>
+                <button onClick={downloadPlayerPDFWithPhotos} className="w-full text-left px-4 py-2 hover:bg-gray-100 flex items-center gap-2 text-sm">
+                  <FiFileText size={14}/> Download PDF (With Photos)
+                </button>
+              </div>
+            </div>
+            <button onClick={() => load()} className="btn-outline gap-2 flex items-center">
+              <FiRefreshCw size={15}/> Refresh
+            </button>
+          </div>
         </div>
 
         {/* Tournament Selector */}
