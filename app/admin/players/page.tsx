@@ -303,7 +303,7 @@ export default function PlayersPage() {
         <div className="flex items-center justify-between flex-wrap gap-3">
           <div>
             <h1 className="page-title">Players</h1>
-            <p className="text-stone-400 text-sm">{players.length} total · {players.filter(p=>p.status==='available').length} available</p>
+            <p className="text-stone-400 text-sm">0 total · 0 available</p>
           </div>
           <div className="flex gap-2">
             <div className="relative group">
