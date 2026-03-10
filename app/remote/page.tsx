@@ -1,6 +1,6 @@
 'use client'
 export const dynamic = 'force-dynamic'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { subLive, subBids, placeBid, passBid, getTeams, LiveState } from '@/lib/db'
 
@@ -8,7 +8,7 @@ import { subLive, subBids, placeBid, passBid, getTeams, LiveState } from '@/lib/
 // URL: /remote?teamId=TEAM_ID&tournamentId=TOURNAMENT_ID
 // Team owners can bid, pass, and see live auction status
 
-export default function RemoteBidding() {
+function RemoteBiddingContent() {
   const searchParams = useSearchParams()
   const teamId = searchParams.get('teamId') || ''
   const tournamentId = searchParams.get('tournamentId') || ''
@@ -407,5 +407,20 @@ export default function RemoteBidding() {
         </div>
       </div>
     </div>
+  )
+}
+
+export default function RemoteBidding() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-gradient-to-br from-saffron-50 to-orange-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="text-6xl mb-4">⚡</div>
+          <p className="text-xl text-gray-600">Loading remote bidding...</p>
+        </div>
+      </div>
+    }>
+      <RemoteBiddingContent />
+    </Suspense>
   )
 }
