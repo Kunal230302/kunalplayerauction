@@ -411,26 +411,38 @@ export default function Home() {
 
 
 
-      {/* ── Rules ──────────────────────────────────────────────────── */}
-      <section id="rules" className="py-16 px-4">
-        <div className="max-w-3xl mx-auto">
-          <h2 className="text-3xl font-extrabold text-stone-800 mb-8 text-center">Auction Rules</h2>
-          <div className="grid sm:grid-cols-2 gap-3">
-            {[
-              '🏏 Only 4 teams are allowed to participate',
-              '💰 All players start from 0 base points',
-              '🚫 No public player registration allowed',
-              '⚙️ Admin-only control over the auction',
-              '📱 Team owners bid from their own devices',
-              '⏱️ Highest bid wins when timer expires',
-              '❌ Unsold players can be re-auctioned',
-              '📄 PDF squad report after auction ends',
-            ].map((r, i) => (
-              <div key={i} className="flex items-center gap-2.5 bg-white border-2 border-stone-100 rounded-xl px-4 py-3 text-sm font-medium text-stone-600 hover:border-saffron-200 hover:bg-saffron-50 transition-all">
-                {r}
-              </div>
-            ))}
+      {/* ── About platform ───────────────────────────────────────────── */}
+      <section id="rules" className="py-20 px-4 bg-white">
+        <div className="max-w-4xl mx-auto text-center">
+          <h2 className="text-3xl sm:text-4xl font-black text-stone-800 mb-6 font-headings">About Player Auction Hub</h2>
+
+          <p className="text-stone-600 text-lg leading-relaxed max-w-3xl mx-auto mb-12 font-medium">
+            We specialize in online player auction software for cricket, football, basketball, and other leagues. With our platform, team owners can participate in live auctions, place real-time bids, and build their dream teams with ease.
+          </p>
+
+          <div className="bg-saffron-50 rounded-3xl p-8 sm:p-12 border-2 border-saffron-100 shadow-sm relative overflow-hidden text-left mb-12">
+            <div className="absolute top-0 right-0 w-64 h-64 bg-saffron-500/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
+            <h3 className="text-xl font-extrabold text-stone-800 mb-6">Our auction software provides features like:</h3>
+            <div className="grid sm:grid-cols-2 gap-x-8 gap-y-4 relative z-10">
+              {[
+                { i: '⚡', t: 'Real-time bidding and instant notifications' },
+                { i: '🎯', t: 'Set bidding limits and track bids easily' },
+                { i: '📊', t: 'Detailed player statistics, performance data, and records' },
+                { i: '�', t: 'Secure, fair, and transparent auction process' }
+              ].map((f, i) => (
+                <div key={i} className="flex items-start gap-4 p-4 rounded-2xl hover:bg-white hover:shadow-sm transition-all border border-transparent hover:border-saffron-200/50">
+                  <div className="w-10 h-10 rounded-xl bg-white flex items-center justify-center text-lg shadow-sm border border-saffron-100 shrink-0">
+                    {f.i}
+                  </div>
+                  <p className="text-stone-600 font-semibold leading-relaxed mt-1">{f.t}</p>
+                </div>
+              ))}
+            </div>
           </div>
+
+          <p className="text-stone-700 text-lg sm:text-xl font-bold leading-relaxed max-w-3xl mx-auto bg-gradient-to-r from-stone-800 to-stone-600 bg-clip-text text-transparent">
+            At Player Auction Hub, we are committed to revolutionizing the way cricket auctions are conducted in India. Whether you are a league organizer or a player, our platform makes the entire process more exciting, efficient, and professional. 🏏🚀
+          </p>
         </div>
       </section>
 
