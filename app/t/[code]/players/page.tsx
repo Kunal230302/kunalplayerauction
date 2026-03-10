@@ -8,19 +8,48 @@ import { uploadToCloudinary } from '@/lib/cloudinary'
 import { FiArrowLeft, FiUpload, FiPlus, FiX, FiCamera } from 'react-icons/fi'
 import toast from 'react-hot-toast'
 
-const getDeviceInfo = () => {
+const getDeviceInfo = async () => {
   const userAgent = navigator.userAgent
   const platform = navigator.platform
   let deviceName = 'Unknown Device'
-  if (userAgent.match(/iPhone/i)) deviceName = 'iPhone'
-  else if (userAgent.match(/iPad/i)) deviceName = 'iPad'
-  else if (userAgent.match(/Android/i)) {
-    const m = userAgent.match(/Android\s+[\d.]+;\s*([^;)]+)/)
-    deviceName = m ? m[1].trim() : 'Android Device'
+
+  // Try modern Client Hints API (gives exact models like "vivo V30" on Chrome/Android)
+  try {
+    const navAny = navigator as any
+    if (navAny.userAgentData && navAny.userAgentData.getHighEntropyValues) {
+      const hd = await navAny.userAgentData.getHighEntropyValues(['model', 'platform'])
+      if (hd.model) {
+        deviceName = hd.model
+        if (hd.platform) deviceName = `${hd.platform} ${hd.model}`
+      }
+    }
+  } catch (e) { }
+
+  // Fallback to User-Agent parsing if Client Hints failed or wasn't available
+  if (deviceName === 'Unknown Device') {
+    if (userAgent.match(/iPhone/i)) {
+      deviceName = 'iPhone'
+      // Try to guess iPhone model roughly
+      if (typeof screen !== 'undefined') {
+        // iPhone 16 Series
+        if (screen.width === 440 && screen.height === 956) deviceName = 'iPhone 16 Pro Max'
+        else if (screen.width === 402 && screen.height === 874) deviceName = 'iPhone 16 Pro'
+        else if (screen.width === 430 && screen.height === 932) deviceName = 'iPhone 16 Plus / 15 Pro Max'
+        else if (screen.width === 393 && screen.height === 852) deviceName = 'iPhone 16 / 15 Pro'
+        else if (screen.width === 428 && screen.height === 926) deviceName = 'iPhone 13/14 Pro Max'
+        else if (screen.width === 390 && screen.height === 844) deviceName = 'iPhone 13/14'
+      }
+    }
+    else if (userAgent.match(/iPad/i)) deviceName = 'iPad'
+    else if (userAgent.match(/Android/i)) {
+      const m = userAgent.match(/Android\s+[\d.]+;\s*([^;)]+)/)
+      deviceName = m && m[1] && m[1].trim() !== 'K' && !m[1].includes('Android') ? m[1].trim() : 'Android Device'
+    }
+    else if (userAgent.match(/Windows/i)) deviceName = 'Windows PC'
+    else if (userAgent.match(/Mac/i)) deviceName = 'Mac'
+    else if (userAgent.match(/Linux/i)) deviceName = 'Linux PC'
   }
-  else if (userAgent.match(/Windows/i)) deviceName = 'Windows PC'
-  else if (userAgent.match(/Mac/i)) deviceName = 'Mac'
-  else if (userAgent.match(/Linux/i)) deviceName = 'Linux PC'
+
   const deviceId = btoa(userAgent + platform + screen.width + screen.height).slice(0, 24)
   return { deviceId, deviceName }
 }
@@ -106,7 +135,7 @@ export default function TournamentPlayersPage() {
       if (paymentSS) {
         paymentScreenshotURL = await uploadToCloudinary(paymentSS, 'tournament-payments')
       }
-      const { deviceId, deviceName } = getDeviceInfo()
+      const { deviceId, deviceName } = await getDeviceInfo()
       await addPlayer({
         name: form.name.trim(), surname: form.surname.trim(), village: '', role: form.role,
         mobile: form.mobile.trim(), dob: form.dob, district: form.district, taluka: form.taluka,
