@@ -191,6 +191,114 @@ export default function Home() {
       </section>
 
 
+      {/* ── Tournaments ──────────────────────────────────────────── */}
+      <section id="tournaments" className="py-16 px-4">
+        <div className="max-w-4xl mx-auto">
+          <div className="text-center mb-10">
+            <h2 className="text-3xl font-extrabold text-stone-800 mb-2">🏆 Registered Tournaments</h2>
+            <p className="text-stone-400 text-sm font-medium">Tournaments currently registered on the platform</p>
+          </div>
+
+          {tournaments.length === 0 ? (
+            <div className="card border-2 border-dashed border-stone-200 py-14 text-center">
+              <div className="text-5xl mb-3">🏆</div>
+              <p className="text-stone-400 font-medium">No tournaments registered yet</p>
+              <p className="text-stone-300 text-sm mt-1">Admin will register tournaments soon — stay tuned!</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+              {tournaments.map(t => {
+                const pct = t.totalPlayersRequired > 0 ? Math.round(((t.registeredPlayers || 0) / t.totalPlayersRequired) * 100) : 0
+                const full = t.totalPlayersRequired > 0 && (t.registeredPlayers || 0) >= t.totalPlayersRequired
+                return (
+                  <div key={t.id} className="card border-2 border-stone-100 hover:border-saffron-200 hover:shadow-xl transition-all overflow-hidden">
+                    {/* Status ribbon */}
+                    <div className={`px-4 py-1.5 text-center text-xs font-extrabold uppercase tracking-widest
+                      ${t.status === 'live' ? 'bg-green-500 text-white' : t.status === 'ended' ? 'bg-stone-400 text-white' : 'bg-saffron-100 text-saffron-700'}`}>
+                      {t.status === 'live' ? '🔴 LIVE' : t.status === 'ended' ? '✅ ENDED' : '🕐 UPCOMING'}
+                    </div>
+
+                    <div className="p-5">
+                      {/* Logo + Name */}
+                      <div className="flex items-start gap-4 mb-4">
+                        <div className="w-16 h-16 rounded-xl border-2 border-saffron-100 bg-saffron-50 flex items-center justify-center overflow-hidden shrink-0">
+                          {t.logoURL ? <img src={t.logoURL} className="w-full h-full object-cover" alt={t.name} /> : <span className="text-3xl">🏆</span>}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <h3 className="font-extrabold text-lg leading-tight">{t.name}</h3>
+                          {t.description && <p className="text-xs text-stone-400 mt-0.5 line-clamp-2">{t.description}</p>}
+                          <div className="flex items-center gap-2 mt-1.5 flex-wrap">
+                            <span className="text-xs font-semibold bg-amber-50 text-amber-700 px-2 py-0.5 rounded-full">
+                              {ballEmoji[t.ballType] || '⚾'} {t.ballType}
+                            </span>
+                            {t.entryFee > 0 && (
+                              <span className="text-xs font-semibold bg-green-50 text-green-700 px-2 py-0.5 rounded-full">₹{t.entryFee}</span>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Player stats */}
+                      <div className="grid grid-cols-2 gap-2 mb-3">
+                        <div className="bg-stone-50 rounded-lg p-2.5 text-center">
+                          <div className="text-xs text-stone-400">Players Required</div>
+                          <div className="font-extrabold text-saffron-600 text-xl">{t.totalPlayersRequired}</div>
+                        </div>
+                        <div className="bg-stone-50 rounded-lg p-2.5 text-center">
+                          <div className="text-xs text-stone-400">Registered</div>
+                          <div className="font-extrabold text-green-600 text-xl">{t.registeredPlayers || 0}</div>
+                        </div>
+                      </div>
+
+                      {/* Progress bar */}
+                      {t.totalPlayersRequired > 0 && (
+                        <div className="mb-3">
+                          <div className="w-full bg-stone-100 rounded-full h-2.5">
+                            <div className={`h-2.5 rounded-full transition-all ${full ? 'bg-red-500' : 'bg-green-500'}`}
+                              style={{ width: `${Math.min(100, pct)}%` }} />
+                          </div>
+                          <p className="text-[11px] text-stone-400 mt-1 font-medium">
+                            {pct}% filled{full && ' · 🔒 Registrations Full'}
+                          </p>
+                        </div>
+                      )}
+
+                      {/* Ground & location */}
+                      {(t.groundName || t.groundLocation) && (
+                        <div className="bg-blue-50 rounded-xl p-3 mb-2 flex items-start gap-2">
+                          <FiMapPin size={14} className="text-blue-500 mt-0.5 shrink-0" />
+                          <div>
+                            {t.groundName && <div className="text-xs font-bold text-blue-700">{t.groundName}</div>}
+                            {t.groundLocation && <div className="text-[11px] text-blue-500">{t.groundLocation}</div>}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Auction location */}
+                      {t.auctionLocation && (
+                        <div className="bg-purple-50 rounded-xl p-3 flex items-start gap-2">
+                          <span className="text-sm shrink-0">🏏</span>
+                          <div>
+                            <div className="text-[11px] text-purple-500">Auction Location</div>
+                            <div className="text-xs font-bold text-purple-700">{t.auctionLocation}</div>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Register button */}
+                      <Link href={`/t/${t.code}`}
+                        className="btn-primary w-full py-2.5 text-center mt-3 gap-2 text-sm">
+                        🏏 Register in Tournament
+                      </Link>
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+          )}
+        </div>
+      </section>
+
 
       {/* ── How it works ───────────────────────────────────────────── */}
       <section id="how" className="py-16 px-4 bg-white">
@@ -315,113 +423,6 @@ export default function Home() {
 
 
 
-      {/* ── Tournaments ──────────────────────────────────────────── */}
-      <section id="tournaments" className="py-16 px-4">
-        <div className="max-w-4xl mx-auto">
-          <div className="text-center mb-10">
-            <h2 className="text-3xl font-extrabold text-stone-800 mb-2">🏆 Registered Tournaments</h2>
-            <p className="text-stone-400 text-sm font-medium">Tournaments currently registered on the platform</p>
-          </div>
-
-          {tournaments.length === 0 ? (
-            <div className="card border-2 border-dashed border-stone-200 py-14 text-center">
-              <div className="text-5xl mb-3">🏆</div>
-              <p className="text-stone-400 font-medium">No tournaments registered yet</p>
-              <p className="text-stone-300 text-sm mt-1">Admin will register tournaments soon — stay tuned!</p>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-              {tournaments.map(t => {
-                const pct = t.totalPlayersRequired > 0 ? Math.round(((t.registeredPlayers || 0) / t.totalPlayersRequired) * 100) : 0
-                const full = t.totalPlayersRequired > 0 && (t.registeredPlayers || 0) >= t.totalPlayersRequired
-                return (
-                  <div key={t.id} className="card border-2 border-stone-100 hover:border-saffron-200 hover:shadow-xl transition-all overflow-hidden">
-                    {/* Status ribbon */}
-                    <div className={`px-4 py-1.5 text-center text-xs font-extrabold uppercase tracking-widest
-                      ${t.status === 'live' ? 'bg-green-500 text-white' : t.status === 'ended' ? 'bg-stone-400 text-white' : 'bg-saffron-100 text-saffron-700'}`}>
-                      {t.status === 'live' ? '🔴 LIVE' : t.status === 'ended' ? '✅ ENDED' : '🕐 UPCOMING'}
-                    </div>
-
-                    <div className="p-5">
-                      {/* Logo + Name */}
-                      <div className="flex items-start gap-4 mb-4">
-                        <div className="w-16 h-16 rounded-xl border-2 border-saffron-100 bg-saffron-50 flex items-center justify-center overflow-hidden shrink-0">
-                          {t.logoURL ? <img src={t.logoURL} className="w-full h-full object-cover" alt={t.name} /> : <span className="text-3xl">🏆</span>}
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <h3 className="font-extrabold text-lg leading-tight">{t.name}</h3>
-                          {t.description && <p className="text-xs text-stone-400 mt-0.5 line-clamp-2">{t.description}</p>}
-                          <div className="flex items-center gap-2 mt-1.5 flex-wrap">
-                            <span className="text-xs font-semibold bg-amber-50 text-amber-700 px-2 py-0.5 rounded-full">
-                              {ballEmoji[t.ballType] || '⚾'} {t.ballType}
-                            </span>
-                            {t.entryFee > 0 && (
-                              <span className="text-xs font-semibold bg-green-50 text-green-700 px-2 py-0.5 rounded-full">₹{t.entryFee}</span>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Player stats */}
-                      <div className="grid grid-cols-2 gap-2 mb-3">
-                        <div className="bg-stone-50 rounded-lg p-2.5 text-center">
-                          <div className="text-xs text-stone-400">Players Required</div>
-                          <div className="font-extrabold text-saffron-600 text-xl">{t.totalPlayersRequired}</div>
-                        </div>
-                        <div className="bg-stone-50 rounded-lg p-2.5 text-center">
-                          <div className="text-xs text-stone-400">Registered</div>
-                          <div className="font-extrabold text-green-600 text-xl">{t.registeredPlayers || 0}</div>
-                        </div>
-                      </div>
-
-                      {/* Progress bar */}
-                      {t.totalPlayersRequired > 0 && (
-                        <div className="mb-3">
-                          <div className="w-full bg-stone-100 rounded-full h-2.5">
-                            <div className={`h-2.5 rounded-full transition-all ${full ? 'bg-red-500' : 'bg-green-500'}`}
-                              style={{ width: `${Math.min(100, pct)}%` }} />
-                          </div>
-                          <p className="text-[11px] text-stone-400 mt-1 font-medium">
-                            {pct}% filled{full && ' · 🔒 Registrations Full'}
-                          </p>
-                        </div>
-                      )}
-
-                      {/* Ground & location */}
-                      {(t.groundName || t.groundLocation) && (
-                        <div className="bg-blue-50 rounded-xl p-3 mb-2 flex items-start gap-2">
-                          <FiMapPin size={14} className="text-blue-500 mt-0.5 shrink-0" />
-                          <div>
-                            {t.groundName && <div className="text-xs font-bold text-blue-700">{t.groundName}</div>}
-                            {t.groundLocation && <div className="text-[11px] text-blue-500">{t.groundLocation}</div>}
-                          </div>
-                        </div>
-                      )}
-
-                      {/* Auction location */}
-                      {t.auctionLocation && (
-                        <div className="bg-purple-50 rounded-xl p-3 flex items-start gap-2">
-                          <span className="text-sm shrink-0">🏏</span>
-                          <div>
-                            <div className="text-[11px] text-purple-500">Auction Location</div>
-                            <div className="text-xs font-bold text-purple-700">{t.auctionLocation}</div>
-                          </div>
-                        </div>
-                      )}
-
-                      {/* Register button */}
-                      <Link href={`/t/${t.code}`}
-                        className="btn-primary w-full py-2.5 text-center mt-3 gap-2 text-sm">
-                        🏏 Register in Tournament
-                      </Link>
-                    </div>
-                  </div>
-                )
-              })}
-            </div>
-          )}
-        </div>
-      </section>
 
       {/* ── Rules ──────────────────────────────────────────────────── */}
       <section id="rules" className="py-16 px-4">
