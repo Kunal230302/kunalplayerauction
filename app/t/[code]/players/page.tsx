@@ -8,34 +8,51 @@ import { uploadToCloudinary } from '@/lib/cloudinary'
 import { FiArrowLeft, FiUpload, FiPlus, FiX, FiCamera } from 'react-icons/fi'
 import toast from 'react-hot-toast'
 
+const getDeviceInfo = () => {
+  const userAgent = navigator.userAgent
+  const platform = navigator.platform
+  let deviceName = 'Unknown Device'
+  if (userAgent.match(/iPhone/i)) deviceName = 'iPhone'
+  else if (userAgent.match(/iPad/i)) deviceName = 'iPad'
+  else if (userAgent.match(/Android/i)) {
+    const m = userAgent.match(/Android\s+[\d.]+;\s*([^;)]+)/)
+    deviceName = m ? m[1].trim() : 'Android Device'
+  }
+  else if (userAgent.match(/Windows/i)) deviceName = 'Windows PC'
+  else if (userAgent.match(/Mac/i)) deviceName = 'Mac'
+  else if (userAgent.match(/Linux/i)) deviceName = 'Linux PC'
+  const deviceId = btoa(userAgent + platform + screen.width + screen.height).slice(0, 24)
+  return { deviceId, deviceName }
+}
+
 const ROLES = ['Batsman', 'Bowler', 'All-Rounder', 'Wicket Keeper']
 
 const DISTRICT_TALUKAS: Record<string, string[]> = {
-  'Ahmedabad': ['Ahmedabad City','Daskroi','Dholka','Sanand','Bavla','Dhandhuka','Viramgam'],
-  'Mehsana': ['Mehsana','Visnagar','Unjha','Patan','Kadi','Kalol','Kheralu','Vadnagar','Becharaji'],
-  'Banaskantha': ['Palanpur','Deesa','Dhanera','Tharad','Vadgam','Kankrej','Dantiwada'],
-  'Sabarkantha': ['Himmatnagar','Idar','Prantij','Khedbrahma','Modasa','Bhiloda'],
-  'Gandhinagar': ['Gandhinagar','Kalol','Dehgam','Mansa'],
-  'Patan': ['Patan','Chanasma','Harij','Santalpur','Radhanpur','Sidhpur'],
-  'Kutch': ['Bhuj','Gandhidham','Anjar','Mandvi','Mundra','Nakhatrana'],
-  'Rajkot': ['Rajkot','Morbi','Gondal','Jetpur','Dhoraji','Upleta','Wankaner'],
-  'Surat': ['Surat City','Olpad','Kamrej','Bardoli','Mahuva','Mangrol'],
-  'Vadodara': ['Vadodara City','Savli','Padra','Karjan','Dabhoi','Waghodia'],
-  'Junagadh': ['Junagadh','Visavadar','Manavadar','Keshod','Mangrol','Veraval'],
-  'Bhavnagar': ['Bhavnagar','Sihor','Palitana','Mahua','Talaja','Gariadhar'],
-  'Jamnagar': ['Jamnagar','Dhrol','Kalavad','Jamjodhpur','Lalpur','Khambhalia'],
-  'Amreli': ['Amreli','Savarkundla','Rajula','Babra','Dhari','Bagasara'],
-  'Anand': ['Anand','Petlad','Khambhat','Borsad','Sojitra','Umreth'],
-  'Kheda': ['Nadiad','Kheda','Kapadvanj','Thasra','Matar','Mehmedabad'],
-  'Bharuch': ['Bharuch','Ankleshwar','Hansot','Jambusar','Jhagadia','Netrang'],
-  'Valsad': ['Valsad','Pardi','Dharampur','Umbergaon','Kaparada'],
-  'Navsari': ['Navsari','Gandevi','Jalalpore','Chikhli','Vansda'],
-  'Aravalli': ['Modasa','Bayad','Bhiloda','Dhansura','Malpur','Meghraj'],
-  'Gir Somnath': ['Veraval','Somnath','Una','Kodinar','Talala'],
-  'Morbi': ['Morbi','Wankaner','Halvad','Maliya','Tankara'],
-  'Surendranagar': ['Surendranagar','Wadhwan','Limbdi','Chotila','Dhrangadhra'],
-  'Botad': ['Botad','Gadhada','Barwala','Ranpur'],
-  'Porbandar': ['Porbandar','Kutiyana','Ranavav'],
+  'Ahmedabad': ['Ahmedabad City', 'Daskroi', 'Dholka', 'Sanand', 'Bavla', 'Dhandhuka', 'Viramgam'],
+  'Mehsana': ['Mehsana', 'Visnagar', 'Unjha', 'Patan', 'Kadi', 'Kalol', 'Kheralu', 'Vadnagar', 'Becharaji'],
+  'Banaskantha': ['Palanpur', 'Deesa', 'Dhanera', 'Tharad', 'Vadgam', 'Kankrej', 'Dantiwada'],
+  'Sabarkantha': ['Himmatnagar', 'Idar', 'Prantij', 'Khedbrahma', 'Modasa', 'Bhiloda'],
+  'Gandhinagar': ['Gandhinagar', 'Kalol', 'Dehgam', 'Mansa'],
+  'Patan': ['Patan', 'Chanasma', 'Harij', 'Santalpur', 'Radhanpur', 'Sidhpur'],
+  'Kutch': ['Bhuj', 'Gandhidham', 'Anjar', 'Mandvi', 'Mundra', 'Nakhatrana'],
+  'Rajkot': ['Rajkot', 'Morbi', 'Gondal', 'Jetpur', 'Dhoraji', 'Upleta', 'Wankaner'],
+  'Surat': ['Surat City', 'Olpad', 'Kamrej', 'Bardoli', 'Mahuva', 'Mangrol'],
+  'Vadodara': ['Vadodara City', 'Savli', 'Padra', 'Karjan', 'Dabhoi', 'Waghodia'],
+  'Junagadh': ['Junagadh', 'Visavadar', 'Manavadar', 'Keshod', 'Mangrol', 'Veraval'],
+  'Bhavnagar': ['Bhavnagar', 'Sihor', 'Palitana', 'Mahua', 'Talaja', 'Gariadhar'],
+  'Jamnagar': ['Jamnagar', 'Dhrol', 'Kalavad', 'Jamjodhpur', 'Lalpur', 'Khambhalia'],
+  'Amreli': ['Amreli', 'Savarkundla', 'Rajula', 'Babra', 'Dhari', 'Bagasara'],
+  'Anand': ['Anand', 'Petlad', 'Khambhat', 'Borsad', 'Sojitra', 'Umreth'],
+  'Kheda': ['Nadiad', 'Kheda', 'Kapadvanj', 'Thasra', 'Matar', 'Mehmedabad'],
+  'Bharuch': ['Bharuch', 'Ankleshwar', 'Hansot', 'Jambusar', 'Jhagadia', 'Netrang'],
+  'Valsad': ['Valsad', 'Pardi', 'Dharampur', 'Umbergaon', 'Kaparada'],
+  'Navsari': ['Navsari', 'Gandevi', 'Jalalpore', 'Chikhli', 'Vansda'],
+  'Aravalli': ['Modasa', 'Bayad', 'Bhiloda', 'Dhansura', 'Malpur', 'Meghraj'],
+  'Gir Somnath': ['Veraval', 'Somnath', 'Una', 'Kodinar', 'Talala'],
+  'Morbi': ['Morbi', 'Wankaner', 'Halvad', 'Maliya', 'Tankara'],
+  'Surendranagar': ['Surendranagar', 'Wadhwan', 'Limbdi', 'Chotila', 'Dhrangadhra'],
+  'Botad': ['Botad', 'Gadhada', 'Barwala', 'Ranpur'],
+  'Porbandar': ['Porbandar', 'Kutiyana', 'Ranavav'],
 }
 const DISTRICTS = Object.keys(DISTRICT_TALUKAS).sort()
 
@@ -78,7 +95,7 @@ export default function TournamentPlayersPage() {
     if (tournament.totalPlayersRequired > 0 && players.length >= tournament.totalPlayersRequired) {
       toast.error('Registrations full!'); return
     }
-    if (tournament.entryFee > 0 && !paymentSS) { toast.error('Upload payment screenshot'); return }
+    // Payment proof disabled - players can register without payment screenshot
     setSaving(true)
     try {
       let photoURL = ''
@@ -89,10 +106,11 @@ export default function TournamentPlayersPage() {
       if (paymentSS) {
         paymentScreenshotURL = await uploadToCloudinary(paymentSS, 'tournament-payments')
       }
+      const { deviceId, deviceName } = getDeviceInfo()
       await addPlayer({
         name: form.name.trim(), surname: form.surname.trim(), village: '', role: form.role,
         mobile: form.mobile.trim(), dob: form.dob, district: form.district, taluka: form.taluka,
-        photoURL, paymentScreenshotURL,
+        photoURL, paymentScreenshotURL, deviceId, deviceName,
       }, tournament.id)
       toast.success(`${form.name} ${form.surname} registered!`)
       setForm({ name: '', surname: '', mobile: '', dob: '', district: '', taluka: '', role: 'Batsman' })
@@ -117,7 +135,7 @@ export default function TournamentPlayersPage() {
     <div className="min-h-screen bg-stone-50">
       <div className="bg-gradient-to-r from-saffron-600 to-orange-500 text-white py-6 px-4">
         <div className="max-w-3xl mx-auto">
-          <Link href={`/t/${code}`} className="inline-flex items-center gap-1.5 text-saffron-100 hover:text-white text-sm mb-3"><FiArrowLeft size={14}/> Back to Tournament</Link>
+          <Link href={`/t/${code}`} className="inline-flex items-center gap-1.5 text-saffron-100 hover:text-white text-sm mb-3"><FiArrowLeft size={14} /> Back to Tournament</Link>
           <h1 className="text-2xl font-extrabold">👤 Player Registration</h1>
           <p className="text-saffron-100 text-sm">{t.name} · Code: {code}</p>
         </div>
@@ -126,7 +144,7 @@ export default function TournamentPlayersPage() {
       <div className="max-w-3xl mx-auto px-4 py-6 space-y-4">
         {!isFull ? (
           <button onClick={() => setModal(true)} className="btn-primary w-full py-3.5 gap-2 text-base">
-            <FiPlus size={18}/> Register New Player
+            <FiPlus size={18} /> Register New Player
           </button>
         ) : (
           <div className="bg-red-50 border-2 border-red-200 rounded-xl p-4 text-center text-red-700 font-bold text-sm">
@@ -146,31 +164,31 @@ export default function TournamentPlayersPage() {
           <div className="bg-white rounded-2xl w-full max-w-md shadow-2xl border-2 border-saffron-100 animate-slide-up my-8">
             <div className="flex items-center justify-between px-6 py-4 border-b-2 border-stone-100 sticky top-0 bg-white rounded-t-2xl z-10">
               <h2 className="font-extrabold text-lg">Register Player</h2>
-              <button onClick={() => setModal(false)} className="p-1.5 text-stone-400 hover:bg-stone-100 rounded-lg"><FiX size={18}/></button>
+              <button onClick={() => setModal(false)} className="p-1.5 text-stone-400 hover:bg-stone-100 rounded-lg"><FiX size={18} /></button>
             </div>
             <div className="p-6 space-y-4">
               {/* Photo */}
               <div className="flex items-center gap-4">
                 <div onClick={() => document.getElementById('pphoto')?.click()}
                   className="w-16 h-16 rounded-xl border-2 border-dashed border-saffron-300 bg-saffron-50 flex items-center justify-center overflow-hidden cursor-pointer hover:bg-saffron-100 transition shrink-0">
-                  {photoPreview ? <img src={photoPreview} className="w-full h-full object-cover"/> : <FiCamera className="text-saffron-400"/>}
+                  {photoPreview ? <img src={photoPreview} className="w-full h-full object-cover" /> : <FiCamera className="text-saffron-400" />}
                 </div>
                 <div>
                   <input id="pphoto" type="file" accept="image/*" className="hidden" onChange={e => {
                     const f = e.target.files?.[0]; if (f) { setPhoto(f); setPhotoPreview(URL.createObjectURL(f)) }
-                  }}/>
+                  }} />
                   <button onClick={() => document.getElementById('pphoto')?.click()} className="btn-outline btn-sm">Upload Photo</button>
                   <p className="text-xs text-stone-400 mt-0.5">Recommended</p>
                 </div>
               </div>
 
               <div className="grid grid-cols-2 gap-3">
-                <div><label className="label">First Name *</label><input className="input" placeholder="Rohit" value={form.name} onChange={e => F('name', e.target.value)}/></div>
-                <div><label className="label">Surname *</label><input className="input" placeholder="Patel" value={form.surname} onChange={e => F('surname', e.target.value)}/></div>
+                <div><label className="label">First Name *</label><input className="input" placeholder="Rohit" value={form.name} onChange={e => F('name', e.target.value)} /></div>
+                <div><label className="label">Surname *</label><input className="input" placeholder="Patel" value={form.surname} onChange={e => F('surname', e.target.value)} /></div>
               </div>
               <div className="grid grid-cols-2 gap-3">
-                <div><label className="label">📱 Mobile *</label><input className="input" type="tel" maxLength={10} placeholder="9876543210" value={form.mobile} onChange={e => F('mobile', e.target.value.replace(/\D/g, '').slice(0, 10))}/></div>
-                <div><label className="label">🎂 DOB *</label><input className="input" type="date" value={form.dob} onChange={e => F('dob', e.target.value)}/></div>
+                <div><label className="label">📱 Mobile *</label><input className="input" type="tel" maxLength={10} placeholder="9876543210" value={form.mobile} onChange={e => F('mobile', e.target.value.replace(/\D/g, '').slice(0, 10))} /></div>
+                <div><label className="label">🎂 DOB *</label><input className="input" type="date" value={form.dob} onChange={e => F('dob', e.target.value)} /></div>
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div>
@@ -200,19 +218,19 @@ export default function TournamentPlayersPage() {
                 <div className="border-t pt-4 space-y-3">
                   <p className="font-bold text-sm text-stone-700">💰 Fee: ₹{t.entryFee}</p>
                   {t.upiQrURL ? (
-                    <img src={t.upiQrURL} alt="UPI QR" className="w-36 h-36 mx-auto rounded-xl border-2 border-green-100 object-contain bg-white p-1"/>
+                    <img src={t.upiQrURL} alt="UPI QR" className="w-36 h-36 mx-auto rounded-xl border-2 border-green-100 object-contain bg-white p-1" />
                   ) : (
                     <div className="w-36 h-36 mx-auto rounded-xl border-2 border-green-100 bg-white flex items-center justify-center"><span className="text-stone-300 text-xs">QR not uploaded</span></div>
                   )}
-                  <p className="text-xs text-green-600 text-center font-semibold">Scan → Pay ₹{t.entryFee} → Upload screenshot</p>
+                  <p className="text-xs text-green-600 text-center font-semibold">Scan → Pay ₹{t.entryFee} → Upload screenshot (optional)</p>
                   <div onClick={() => document.getElementById('payModal')?.click()}
                     className={`border-2 border-dashed rounded-xl p-3 text-center cursor-pointer transition ${paymentPreview ? 'border-green-400 bg-green-50' : 'border-stone-300'}`}>
-                    {paymentPreview ? <><img src={paymentPreview} className="max-h-24 mx-auto rounded-lg"/><p className="text-xs text-green-600 font-bold mt-1">✅ Uploaded</p></> :
-                      <><FiUpload className="mx-auto text-stone-400 mb-1"/><p className="text-xs text-stone-400">Upload payment screenshot *</p></>}
+                    {paymentPreview ? <><img src={paymentPreview} className="max-h-24 mx-auto rounded-lg" /><p className="text-xs text-green-600 font-bold mt-1">✅ Uploaded</p></> :
+                      <><FiUpload className="mx-auto text-stone-400 mb-1" /><p className="text-xs text-stone-400">Upload payment screenshot (optional)</p></>}
                   </div>
                   <input id="payModal" type="file" accept="image/*" className="hidden" onChange={e => {
                     const f = e.target.files?.[0]; if (f) { setPaymentSS(f); setPaymentPreview(URL.createObjectURL(f)) }
-                  }}/>
+                  }} />
                 </div>
               )}
             </div>

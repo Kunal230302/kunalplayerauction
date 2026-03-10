@@ -1,0 +1,445 @@
+'use client'
+export const dynamic = 'force-dynamic'
+import { useState, useEffect, useRef } from 'react'
+import { FiPlay, FiPause, FiRotateCcw, FiRefreshCw, FiX, FiPlus, FiMinus } from 'react-icons/fi'
+
+// Cricket Scoring System with Live Animations
+// Features: Live scoring, YouTube ticker, match/series management, player statistics
+
+interface Player {
+  id: string
+  name: string
+  runs: number
+  balls: number
+  fours: number
+  sixes: number
+  wickets: number
+  overs: number
+  maidens: number
+  strikeRate: number
+  catches: number
+  runOuts: number
+  stumpings: number
+  isOut: boolean
+  battingPosition: number
+}
+
+interface Over {
+  overNumber: number
+  runs: number
+  wickets: number
+  balls: { runs: number; isWicket: boolean; ballNumber: number }[]
+}
+
+interface Match {
+  id: string
+  team1: string
+  team2: string
+  team1Score: { runs: number; wickets: number; overs: number }
+  team2Score: { runs: number; wickets: number; overs: number }
+  status: 'live' | 'completed' | 'scheduled'
+  currentBatting: 'team1' | 'team2'
+  overs: Over[]
+}
+
+interface Series {
+  id: string
+  name: string
+  matches: Match[]
+  totalMatches: number
+  completed: number
+}
+
+export default function CricketScoring() {
+  const [match, setMatch] = useState<Match | null>(null)
+  const [team1Players, setTeam1Players] = useState<Player[]>([])
+  const [team2Players, setTeam2Players] = useState<Player[]>([])
+  const [currentBatsman, setCurrentBatsman] = useState<Player | null>(null)
+  const [currentBowler, setCurrentBowler] = useState<Player | null>(null)
+  const [currentOver, setCurrentOver] = useState<Over>({ overNumber: 1, runs: 0, wickets: 0, balls: [] })
+  const [ballCount, setBallCount] = useState(0)
+  const [isLive, setIsLive] = useState(false)
+  const [tickerText, setTickerText] = useState('Welcome to Live Cricket Scoring! 🏏�')
+  const [series, setSeries] = useState<Series[]>([])
+  const [selectedSeries, setSelectedSeries] = useState<Series | null>(null)
+  const [showSetup, setShowSetup] = useState(true)
+  const [youtubeMode, setYoutubeMode] = useState(false)
+  const [bestStats, setBestStats] = useState({
+    bestBatsman: null as Player | null,
+    bestBowler: null as Player | null,
+    bestCatches: null as Player | null
+  })
+
+  const tickerRef = useRef<HTMLDivElement>(null)
+
+  // Initialize sample data
+  useEffect(() => {
+    const sampleSeries: Series[] = [
+      {
+        id: '1',
+        name: 'IPL 2024',
+        matches: [],
+        totalMatches: 10,
+        completed: 3
+      }
+    ]
+    setSeries(sampleSeries)
+    setSelectedSeries(sampleSeries[0])
+  }, [])
+
+  // Ticker animation
+  useEffect(() => {
+    const messages = [
+      '🏏� Welcome to Live Cricket Scoring!',
+      '🔴 Match is LIVE now!',
+      '📊 Real-time scoring updates',
+      '🎯 Track player statistics',
+      '🏆 Series standings available',
+      '📺 YouTube ticker mode ready'
+    ]
+    
+    let index = 0
+    const interval = setInterval(() => {
+      setTickerText(messages[index % messages.length])
+      index++
+    }, 3000)
+
+    return () => clearInterval(interval)
+  }, [])
+
+  // Calculate best players
+  const calculateBestPlayers = () => {
+    const allPlayers = [...team1Players, ...team2Players]
+    
+    const bestBatsman = allPlayers.reduce((best, player) => 
+      (player.runs > (best?.runs || 0) && player.balls > 0) ? player : best, null as Player | null)
+    
+    const bestBowler = allPlayers.reduce((best, player) => 
+      (player.wickets > (best?.wickets || 0)) ? player : best, null as Player | null)
+    
+    const bestCatches = allPlayers.reduce((best, player) => 
+      (player.catches > (best?.catches || 0)) ? player : best, null as Player | null)
+
+    setBestStats({ bestBatsman, bestBowler, bestCatches })
+  }
+
+  const addBall = (runs: number, isWicket: boolean = false) => {
+    if (ballCount >= 6) {
+      // Complete the over
+      setCurrentOver(prev => ({
+        ...prev,
+        runs: prev.runs + runs,
+        wickets: prev.wickets + (isWicket ? 1 : 0)
+      }))
+      setBallCount(0)
+    } else {
+      setCurrentOver(prev => ({
+        ...prev,
+        balls: [...prev.balls, { runs, isWicket, ballNumber: ballCount + 1 }]
+      }))
+      setBallCount(prev => prev + 1)
+    }
+
+    // Update current batsman
+    if (currentBatsman && !isWicket) {
+      setCurrentBatsman(prev => prev ? {
+        ...prev,
+        runs: prev.runs + runs,
+        balls: prev.balls + 1,
+        fours: prev.fours + (runs === 4 ? 1 : 0),
+        sixes: prev.sixes + (runs === 6 ? 1 : 0),
+        strikeRate: ((prev.runs + runs) / (prev.balls + 1)) * 100
+      } : null)
+    }
+  }
+
+  const addWicket = () => {
+    if (currentBatsman) {
+      setCurrentBatsman(prev => prev ? {
+        ...prev,
+        isOut: true,
+        wickets: prev.wickets + 1
+      } : null)
+      
+      // Update bowler stats
+      if (currentBowler) {
+        setCurrentBowler(prev => prev ? {
+          ...prev,
+          wickets: prev.wickets + 1
+        } : null)
+      }
+    }
+  }
+
+  const startMatch = () => {
+    setShowSetup(false)
+    setIsLive(true)
+    setTickerText('🔴 MATCH STARTED! Live scoring in progress...')
+    
+    const newMatch: Match = {
+      id: Date.now().toString(),
+      team1: 'Team Mumbai',
+      team2: 'Team Delhi',
+      team1Score: { runs: 0, wickets: 0, overs: 0 },
+      team2Score: { runs: 0, wickets: 0, overs: 0 },
+      status: 'live',
+      currentBatting: 'team1',
+      overs: []
+    }
+    setMatch(newMatch)
+  }
+
+  const toggleLive = () => {
+    setIsLive(!isLive)
+    setTickerText(isLive ? '⏸️ Match paused' : '🔴 Match resumed!')
+  }
+
+  if (showSetup) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-green-50 to-emerald-100 p-4">
+        <div className="max-w-4xl mx-auto">
+          <div className="text-center mb-8">
+            <h1 className="text-4xl font-bold text-green-800 mb-2">🏏� Cricket Scoring System</h1>
+            <p className="text-green-600">Professional Live Cricket Scoring with Animations</p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+            {/* Series Selection */}
+            <div className="bg-white rounded-xl shadow-lg p-6">
+              <h2 className="text-xl font-bold text-gray-800 mb-4">🏆 Select Series</h2>
+              <div className="space-y-3">
+                {series.map(s => (
+                  <button
+                    key={s.id}
+                    onClick={() => setSelectedSeries(s)}
+                    className={`w-full p-3 rounded-lg text-left transition-all ${
+                      selectedSeries?.id === s.id 
+                        ? 'bg-green-500 text-white' 
+                        : 'bg-gray-100 hover:bg-gray-200 text-gray-700'
+                    }`}
+                  >
+                    <div className="font-bold">{s.name}</div>
+                    <div className="text-sm">{s.completed}/{s.totalMatches} matches</div>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Quick Actions */}
+            <div className="bg-white rounded-xl shadow-lg p-6">
+              <h2 className="text-xl font-bold text-gray-800 mb-4">⚡ Quick Actions</h2>
+              <div className="space-y-3">
+                <button
+                  onClick={() => setYoutubeMode(!youtubeMode)}
+                  className={`w-full p-4 rounded-lg font-bold transition-all ${
+                    youtubeMode 
+                      ? 'bg-red-500 text-white hover:bg-red-600' 
+                      : 'bg-blue-500 text-white hover:bg-blue-600'
+                  }`}
+                >
+                  {youtubeMode ? '📺 YouTube Ticker Mode' : '📊 Standard Scoring Mode'}
+                </button>
+                <button
+                  onClick={startMatch}
+                  className="w-full bg-green-500 text-white p-4 rounded-lg font-bold hover:bg-green-600 transition-all"
+                >
+                  🏏� Start New Match
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-green-50 to-emerald-100">
+      {/* YouTube Ticker */}
+      <div className="bg-black text-white py-2 px-4 overflow-hidden">
+        <div 
+          ref={tickerRef}
+          className="whitespace-nowrap animate-marquee text-lg font-bold"
+          style={{
+            animation: 'marquee 20s linear infinite'
+          }}
+        >
+          {tickerText} • {tickerText} • {tickerText} • 
+        </div>
+      </div>
+
+      {/* Main Scoring Interface */}
+      <div className="max-w-7xl mx-auto p-4">
+        {/* Header */}
+        <div className="bg-white rounded-xl shadow-lg p-6 mb-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-3xl font-bold text-gray-800">
+                {match ? `${match.team1} vs ${match.team2}` : 'Cricket Scoring'}
+              </h1>
+              <p className="text-gray-600">
+                {selectedSeries?.name} • {match?.status === 'live' ? '🔴 LIVE' : 'Scheduled'}
+              </p>
+            </div>
+            <div className="flex gap-3">
+              <button
+                onClick={toggleLive}
+                className={`px-6 py-3 rounded-lg font-bold transition-all ${
+                  isLive 
+                    ? 'bg-red-500 text-white hover:bg-red-600' 
+                    : 'bg-green-500 text-white hover:bg-green-600'
+                }`}
+              >
+                {isLive ? <FiPause size={20} /> : <FiPlay size={20} />}
+                {isLive ? 'Pause' : 'Resume'}
+              </button>
+              <button className="bg-blue-500 text-white px-6 py-3 rounded-lg font-bold hover:bg-blue-600 transition-all">
+                <FiRefreshCw size={20} /> Refresh
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* Score Display */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+          {/* Team 1 Score */}
+          <div className="bg-white rounded-xl shadow-lg p-6">
+            <h3 className="text-xl font-bold text-gray-800 mb-4">🏏 {match?.team1 || 'Team 1'}</h3>
+            <div className="text-center">
+              <div className="text-5xl font-bold text-green-600 animate-pulse">
+                {match?.team1Score.runs || 0}/{match?.team1Score.wickets || 0}
+              </div>
+              <div className="text-gray-600">
+                ({Math.floor((match?.team1Score.overs || 0)}.{((match?.team1Score.overs || 0) % 1) * 6} overs)
+              </div>
+            </div>
+          </div>
+
+          {/* Current Over */}
+          <div className="bg-white rounded-xl shadow-lg p-6">
+            <h3 className="text-xl font-bold text-gray-800 mb-4">🎯 Current Over</h3>
+            <div className="text-center">
+              <div className="text-3xl font-bold text-blue-600 mb-2">
+                Over {currentOver.overNumber}.{ballCount + 1}
+              </div>
+              <div className="text-2xl font-bold text-gray-800">
+                Runs: {currentOver.runs} | Wickets: {currentOver.wickets}
+              </div>
+            </div>
+          </div>
+
+          {/* Team 2 Score */}
+          <div className="bg-white rounded-xl shadow-lg p-6">
+            <h3 className="text-xl font-bold text-gray-800 mb-4">🏏 {match?.team2 || 'Team 2'}</h3>
+            <div className="text-center">
+              <div className="text-5xl font-bold text-green-600">
+                {match?.team2Score.runs || 0}/{match?.team2Score.wickets || 0}
+              </div>
+              <div className="text-gray-600">
+                ({Math.floor((match?.team2Score.overs || 0)}.{((match?.team2Score.overs || 0) % 1) * 6} overs)
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Scoring Controls */}
+        <div className="bg-white rounded-xl shadow-lg p-6 mb-6">
+          <h3 className="text-xl font-bold text-gray-800 mb-4">⚡ Scoring Controls</h3>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            {/* Run Buttons */}
+            {[0, 1, 2, 3, 4, 6].map(runs => (
+              <button
+                key={runs}
+                onClick={() => addBall(runs)}
+                className="bg-blue-500 text-white p-4 rounded-lg font-bold text-xl hover:bg-blue-600 transition-all transform hover:scale-105"
+              >
+                {runs === 0 ? 'Dot' : runs}
+              </button>
+            ))}
+            
+            {/* Wicket Button */}
+            <button
+              onClick={addWicket}
+              className="bg-red-500 text-white p-4 rounded-lg font-bold hover:bg-red-600 transition-all transform hover:scale-105"
+            >
+              Wicket
+            </button>
+
+            {/* Extra Controls */}
+            <button className="bg-orange-500 text-white p-4 rounded-lg font-bold hover:bg-orange-600 transition-all">
+              Wide
+            </button>
+            <button className="bg-orange-500 text-white p-4 rounded-lg font-bold hover:bg-orange-600 transition-all">
+              No Ball
+            </button>
+          </div>
+        </div>
+
+        {/* Best Players Statistics */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+          <div className="bg-white rounded-xl shadow-lg p-6">
+            <h3 className="text-xl font-bold text-gray-800 mb-4">🏏 Best Batsman</h3>
+            {bestStats.bestBatsman ? (
+              <div>
+                <div className="text-2xl font-bold text-green-600">{bestStats.bestBatsman.name}</div>
+                <div className="text-gray-600">{bestStats.bestBatsman.runs} runs</div>
+                <div className="text-sm text-gray-500">SR: {bestStats.bestBatsman.strikeRate?.toFixed(2)}</div>
+              </div>
+            ) : (
+              <div className="text-gray-400">No data yet</div>
+            )}
+          </div>
+
+          <div className="bg-white rounded-xl shadow-lg p-6">
+            <h3 className="text-xl font-bold text-gray-800 mb-4">⚡ Best Bowler</h3>
+            {bestStats.bestBowler ? (
+              <div>
+                <div className="text-2xl font-bold text-blue-600">{bestStats.bestBowler.name}</div>
+                <div className="text-gray-600">{bestStats.bestBowler.wickets} wickets</div>
+                <div className="text-sm text-gray-500">Economy: {((bestStats.bestBowler.runs || 0) / (bestStats.bestBowler.overs || 1)).toFixed(2)}</div>
+              </div>
+            ) : (
+              <div className="text-gray-400">No data yet</div>
+            )}
+          </div>
+
+          <div className="bg-white rounded-xl shadow-lg p-6">
+            <h3 className="text-xl font-bold text-gray-800 mb-4">🤾 Best Catches</h3>
+            {bestStats.bestCatches ? (
+              <div>
+                <div className="text-2xl font-bold text-purple-600">{bestStats.bestCatches.name}</div>
+                <div className="text-gray-600">{bestStats.bestCatches.catches} catches</div>
+                <div className="text-sm text-gray-500">Run Outs: {bestStats.bestCatches.runOuts}</div>
+              </div>
+            ) : (
+              <div className="text-gray-400">No data yet</div>
+            )}
+          </div>
+        </div>
+
+        {/* Series Standings */}
+        {selectedSeries && (
+          <div className="bg-white rounded-xl shadow-lg p-6">
+            <h3 className="text-xl font-bold text-gray-800 mb-4">🏆 Series Standings</h3>
+            <div className="text-gray-600">
+              <p>Series: {selectedSeries.name}</p>
+              <p>Completed: {selectedSeries.completed}/{selectedSeries.totalMatches} matches</p>
+            </div>
+          </div>
+        )}
+      </div>
+
+      <style jsx>{`
+        @keyframes marquee {
+          0% { transform: translateX(100%); }
+          100% { transform: translateX(-100%); }
+        }
+        .animate-marquee {
+          display: inline-block;
+          padding-left: 100%;
+          animation: marquee 20s linear infinite;
+        }
+      `}</style>
+    </div>
+  )
+}

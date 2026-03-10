@@ -22,10 +22,12 @@ export interface Player {
   photoURL: string; paymentScreenshotURL: string
   status: 'available' | 'sold' | 'unsold'
   soldTo?: string; soldToName?: string; soldPoints?: number
+  deviceId?: string; deviceName?: string; registeredAt?: number
 }
 export interface Team {
   id: string; teamName: string; ownerName: string; logoURL: string
   points: number; playersBought: number
+  deviceId?: string; deviceName?: string; registeredAt?: number
 }
 export interface Settings {
   auctionTitle: string; auctionDate: string
@@ -129,7 +131,12 @@ export const getPlayers = async (tournamentId?: string): Promise<Player[]> => {
 }
 export const addPlayer = (d: Omit<Player, 'id' | 'status'>, tournamentId?: string) => {
   const col = tournamentId ? playersCol(tournamentId) : collection(db, 'players')
-  return addDoc(col, { ...d, status: 'available', createdAt: serverTimestamp() })
+  return addDoc(col, { 
+    ...d, 
+    status: 'available', 
+    createdAt: serverTimestamp(),
+    registeredAt: Date.now()
+  })
 }
 export const updatePlayer = (id: string, d: any, tournamentId?: string) => {
   const path = tournamentId ? `tournaments/${tournamentId}/players/${id}` : `players/${id}`
@@ -283,4 +290,40 @@ export const passBid = async (tournamentId: string, teamId: string, teamName: st
     pass: true,
     ts: Date.now() 
   })
+}
+
+// ── CRICKET SCORING ─────────────────────────────────────────────────────────
+
+export interface CricketMatch {
+  id: string
+  team1: string
+  team2: string
+  team1Score: { runs: number; wickets: number; overs: number }
+  team2Score: { runs: number; wickets: number; overs: number }
+  currentInning: 'team1' | 'team2'
+  striker: { name: string; runs: number; balls: number; fours: number; sixes: number; strikeRate: number } | null
+  nonStriker: { name: string; runs: number; balls: number; fours: number; sixes: number; strikeRate: number } | null
+  currentBowler: { name: string; wickets: number; runs: number; overs: number; economy: number } | null
+  thisOver: { runs: number; wickets: number; balls: string[] }
+  extras: { wides: number; noBalls: number; byes: number; legByes: number; penalties: number; total: number }
+  partnerships: { runs: number; balls: number }[]
+  projectedScore: number
+  requiredRate: string
+  status: 'live' | 'completed' | 'scheduled'
+  lastUpdated: number
+}
+
+export const saveCricketMatch = async (match: CricketMatch, matchId: string = 'default') => {
+  await set(ref(rtdb, `cricket/${matchId}`), {
+    ...match,
+    lastUpdated: Date.now()
+  })
+}
+
+export const subscribeCricketMatch = (matchId: string, callback: (match: CricketMatch | null) => void) => {
+  const matchRef = ref(rtdb, `cricket/${matchId}`)
+  const unsubscribe = onValue(matchRef, (snapshot) => {
+    callback(snapshot.val() as CricketMatch | null)
+  })
+  return unsubscribe
 }

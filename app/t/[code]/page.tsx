@@ -8,6 +8,126 @@ import { uploadToCloudinary } from '@/lib/cloudinary'
 import { FiUsers, FiShield, FiMapPin, FiZap, FiCopy, FiUpload, FiPlus, FiX, FiCamera } from 'react-icons/fi'
 import toast from 'react-hot-toast'
 
+// Device detection utility - Enhanced version with specific model detection
+const getDeviceInfo = () => {
+  const userAgent = navigator.userAgent
+  const platform = navigator.platform
+  let deviceName = 'Unknown Device'
+  let deviceModel = ''
+  
+  // Try to extract specific device model from user agent
+  // iPhone detection with model attempt
+  const iPhoneMatch = userAgent.match(/iPhone[^(]*\(([^)]+)\)/)
+  const iPadMatch = userAgent.match(/iPad[^(]*\(([^)]+)\)/)
+  
+  if (userAgent.match(/iPhone/i)) {
+    // Try to get model from various iPhone indicators
+    if (userAgent.includes('iPhone16,2')) deviceModel = 'iPhone 15 Pro Max'
+    else if (userAgent.includes('iPhone16,1')) deviceModel = 'iPhone 15 Pro'
+    else if (userAgent.includes('iPhone15,5')) deviceModel = 'iPhone 15 Plus'
+    else if (userAgent.includes('iPhone15,4')) deviceModel = 'iPhone 15'
+    else if (userAgent.includes('iPhone14,8')) deviceModel = 'iPhone 14 Pro Max'
+    else if (userAgent.includes('iPhone14,7')) deviceModel = 'iPhone 14 Pro'
+    else if (userAgent.includes('iPhone14,6')) deviceModel = 'iPhone 14 Plus'
+    else if (userAgent.includes('iPhone14,5')) deviceModel = 'iPhone 14'
+    else if (userAgent.includes('iPhone13,4')) deviceModel = 'iPhone 13 Pro Max'
+    else if (userAgent.includes('iPhone13,3')) deviceModel = 'iPhone 13 Pro'
+    else if (userAgent.includes('iPhone13,2')) deviceModel = 'iPhone 13'
+    else if (userAgent.includes('iPhone12,8')) deviceModel = 'iPhone SE (3rd gen)'
+    else if (userAgent.includes('iPhone12,5')) deviceModel = 'iPhone 12 Pro Max'
+    else if (userAgent.includes('iPhone12,3')) deviceModel = 'iPhone 12 Pro'
+    else if (userAgent.includes('iPhone12,1')) deviceModel = 'iPhone 12'
+    else if (userAgent.includes('iPhone11,8')) deviceModel = 'iPhone XR'
+    else if (userAgent.includes('iPhone11,6')) deviceModel = 'iPhone XS Max'
+    else if (userAgent.includes('iPhone11,4')) deviceModel = 'iPhone XS Max'
+    else if (userAgent.includes('iPhone11,2')) deviceModel = 'iPhone XS'
+    else if (userAgent.includes('iPhone10,6')) deviceModel = 'iPhone X'
+    else if (userAgent.includes('iPhone10,4')) deviceModel = 'iPhone 8'
+    else if (userAgent.includes('iPhone10,2')) deviceModel = 'iPhone 8 Plus'
+    else if (userAgent.includes('iPhone10,1')) deviceModel = 'iPhone 8'
+    else if (userAgent.includes('iPhone9,4')) deviceModel = 'iPhone 7 Plus'
+    else if (userAgent.includes('iPhone9,3')) deviceModel = 'iPhone 7'
+    else if (userAgent.includes('iPhone9,2')) deviceModel = 'iPhone 7 Plus'
+    else if (userAgent.includes('iPhone9,1')) deviceModel = 'iPhone 7'
+    else deviceModel = 'iPhone'
+    
+    deviceName = deviceModel
+  }
+  else if (userAgent.match(/iPad/i)) {
+    if (userAgent.includes('iPad13,16') || userAgent.includes('iPad13,17')) deviceModel = 'iPad Air 5'
+    else if (userAgent.includes('iPad13,4') || userAgent.includes('iPad13,5') || userAgent.includes('iPad13,6') || userAgent.includes('iPad13,7')) deviceModel = 'iPad Pro 12.9" (5th gen)'
+    else if (userAgent.includes('iPad13,1') || userAgent.includes('iPad13,2')) deviceModel = 'iPad Air 4'
+    else if (userAgent.includes('iPad12,1') || userAgent.includes('iPad12,2')) deviceModel = 'iPad 9'
+    else if (userAgent.includes('iPad11,6') || userAgent.includes('iPad11,7')) deviceModel = 'iPad mini 6'
+    else deviceModel = 'iPad'
+    
+    deviceName = deviceModel
+  }
+  else if (userAgent.match(/Android/i)) {
+    // Try to extract Android device model
+    const androidMatch = userAgent.match(/Android\s+([\d.]+);\s*([^;)]+)/)
+    if (androidMatch) {
+      const androidVersion = androidMatch[1]
+      const deviceInfo = androidMatch[2].trim()
+      
+      // Common device patterns
+      if (deviceInfo.includes('Samsung') || deviceInfo.includes('SM-')) {
+        const samsungModel = deviceInfo.match(/SM-[A-Z0-9]+/)
+        deviceModel = samsungModel ? `Samsung ${samsungModel[0]}` : deviceInfo
+      } else if (deviceInfo.includes('Pixel')) {
+        const pixelMatch = deviceInfo.match(/Pixel\s*\d+\s*(?:Pro|XL)?/i)
+        deviceModel = pixelMatch ? `Google ${pixelMatch[0]}` : 'Google Pixel'
+      } else if (deviceInfo.includes('OnePlus')) {
+        const oneplusMatch = deviceInfo.match(/OnePlus\s*\d+/i)
+        deviceModel = oneplusMatch ? oneplusMatch[0] : 'OnePlus'
+      } else if (deviceInfo.includes('Xiaomi') || deviceInfo.includes('MI')) {
+        deviceModel = `Xiaomi ${deviceInfo.replace('Xiaomi', '').trim()}`
+      } else if (deviceInfo.includes('Redmi')) {
+        deviceModel = deviceInfo
+      } else if (deviceInfo.includes('OPPO')) {
+        deviceModel = deviceInfo
+      } else if (deviceInfo.includes('vivo')) {
+        deviceModel = deviceInfo
+      } else if (deviceInfo.includes('Realme')) {
+        deviceModel = deviceInfo
+      } else {
+        deviceModel = deviceInfo
+      }
+      deviceName = deviceModel
+    } else {
+      deviceName = 'Android Device'
+    }
+  }
+  else if (userAgent.match(/Windows/i)) {
+    const windowsMatch = userAgent.match(/Windows\s+NT\s+([\d.]+)/)
+    const winVersion = windowsMatch ? windowsMatch[1] : ''
+    let winName = 'Windows'
+    if (winVersion === '10.0') winName = 'Windows 10/11'
+    else if (winVersion === '6.3') winName = 'Windows 8.1'
+    else if (winVersion === '6.2') winName = 'Windows 8'
+    else if (winVersion === '6.1') winName = 'Windows 7'
+    
+    deviceName = winName
+  }
+  else if (userAgent.match(/Mac/i)) {
+    if (userAgent.includes('MacBook Pro')) deviceName = 'MacBook Pro'
+    else if (userAgent.includes('MacBook Air')) deviceName = 'MacBook Air'
+    else if (userAgent.includes('MacBook')) deviceName = 'MacBook'
+    else if (userAgent.includes('iMac')) deviceName = 'iMac'
+    else if (userAgent.includes('Mac mini')) deviceName = 'Mac mini'
+    else if (userAgent.includes('Mac Studio')) deviceName = 'Mac Studio'
+    else deviceName = 'Mac'
+  }
+  else if (userAgent.match(/Linux/i)) {
+    deviceName = 'Linux PC'
+  }
+  
+  // Generate device ID from user agent + screen + platform
+  const deviceId = btoa(userAgent + platform + screen.width + screen.height).slice(0, 24)
+  
+  return { deviceId, deviceName }
+}
+
 const ballEmoji: Record<string, string> = {
   'Tennis Ball': '🎾', 'Leather Ball': '🏏', 'Heavy Tennis Ball': '🥎',
   'Mini Ball (Smiley)': '😊', 'Plastic Ball': '⚪',
@@ -138,10 +258,13 @@ export default function TournamentPage() {
       if (paymentSS) {
         paymentScreenshotURL = await uploadToCloudinary(paymentSS, 'tournament-payments')
       }
+      // Get device info
+      const { deviceId, deviceName } = getDeviceInfo()
+      
       await addPlayer({
         name: form.name.trim(), surname: form.surname.trim(), village: '', role: form.role,
         mobile: form.mobile.trim(), dob: form.dob, district: form.district, taluka: form.taluka,
-        photoURL, paymentScreenshotURL,
+        photoURL, paymentScreenshotURL, deviceId, deviceName
       }, tournament.id)
       toast.success(`${form.name} ${form.surname} registered! 🏏`)
       setForm({ name: '', surname: '', mobile: '', dob: '', district: '', taluka: '', role: 'Batsman' })
@@ -349,18 +472,18 @@ export default function TournamentPage() {
                       ) : (
                         <div className="w-40 h-40 mx-auto rounded-xl border-2 border-green-100 bg-white flex items-center justify-center"><span className="text-stone-300 text-sm">QR not uploaded</span></div>
                       )}
-                      <p className="text-xs text-green-600 font-semibold mt-2">Pay ₹{t.entryFee} • Then upload screenshot</p>
+                      <p className="text-xs text-green-600 font-semibold mt-2">Entry Fee: ₹{t.entryFee} • Upload screenshot if paid (optional)</p>
                     </div>
                     {/* Upload payment screenshot */}
                     <div className="flex flex-col justify-center">
-                      <label className="label mb-2">📸 Upload Payment Screenshot *</label>
+                      <label className="label mb-2">📸 Upload Payment Screenshot (optional)</label>
                       <div onClick={() => document.getElementById('paymentSS')?.click()}
                         className={`border-2 border-dashed rounded-2xl p-4 text-center cursor-pointer transition-all hover:bg-green-50
                           ${paymentPreview ? 'border-green-400 bg-green-50' : 'border-stone-300'}`}>
                         {paymentPreview ? (
                           <div><img src={paymentPreview} className="w-full max-h-32 object-contain rounded-lg mx-auto" /><p className="text-xs text-green-600 font-bold mt-2">✅ Screenshot uploaded</p></div>
                         ) : (
-                          <div><FiUpload className="mx-auto text-stone-400 mb-1" size={24} /><p className="text-xs text-stone-400 font-semibold">Tap to upload payment screenshot</p></div>
+                          <><FiUpload className="mx-auto text-stone-400 mb-1"/><p className="text-xs text-stone-400">Upload payment screenshot (optional)</p></>
                         )}
                       </div>
                       <input id="paymentSS" type="file" accept="image/*" className="hidden" onChange={e => {

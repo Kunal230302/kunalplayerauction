@@ -209,6 +209,11 @@ export default function AdminTeamsPage() {
                   </button>
                 </div>
                 <div className="text-xs text-stone-500 font-semibold mt-1">{t.playersBought||0} players · {t.points||0} pts</div>
+                {(t as any).deviceName && (
+                  <div className="text-[10px] text-blue-500 font-medium mt-1" title={`Device: ${(t as any).deviceName} | ID: ${(t as any).deviceId}`}>
+                    📱 {(t as any).deviceName}
+                  </div>
+                )}
                 <div className="flex gap-1.5 mt-3 justify-center">
                   <button onClick={()=>openEdit(t)} className="p-1.5 text-stone-400 hover:text-saffron-500 hover:bg-saffron-50 rounded-lg transition-all"><FiEdit2 size={14}/></button>
                   <button onClick={()=>openRemoteLink(t.id)} className="p-1.5 text-stone-400 hover:text-blue-500 hover:bg-blue-50 rounded-lg transition-all" title="Open Remote Bidding Link">
