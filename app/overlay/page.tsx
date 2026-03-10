@@ -1,6 +1,6 @@
 'use client'
 export const dynamic = 'force-dynamic'
-import { useEffect, useState, useRef } from 'react'
+import { useEffect, useState, useRef, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { subLive, subBids, getPlayers, LiveState } from '@/lib/db'
 
@@ -14,7 +14,7 @@ import { subLive, subBids, getPlayers, LiveState } from '@/lib/db'
 // 🍎 iOS: Safari → Full screen → AirPlay to Apple TV/Streamlabs
 // 📲 Android: Chrome → Full screen → Screen recording/streaming apps
 
-export default function OverlayPage() {
+function OverlayPageContent() {
   const searchParams = useSearchParams()
   const tid = searchParams.get('tid') || undefined   // ← reads ?tid= from URL
 
@@ -654,5 +654,20 @@ export default function OverlayPage() {
 
       </div>
     </div>
+  )
+}
+
+export default function OverlayPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-black flex items-center justify-center">
+        <div className="text-center">
+          <div className="text-6xl mb-4 text-white">⚡</div>
+          <p className="text-xl text-white">Loading overlay...</p>
+        </div>
+      </div>
+    }>
+      <OverlayPageContent />
+    </Suspense>
   )
 }
