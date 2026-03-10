@@ -2,7 +2,7 @@
 export const dynamic = 'force-dynamic'
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
-import { getSettings, getPlayers, getTournaments, Tournament } from '@/lib/db'
+import { getSettings, getPlayers, getTournaments, getTeamCount, Tournament } from '@/lib/db'
 import { FiLogIn, FiInstagram, FiMapPin, FiClock } from 'react-icons/fi'
 import SplashScreen from '@/components/SplashScreen'
 
@@ -71,13 +71,20 @@ export default function Home() {
   const [settings, setSettings] = useState<any>({})
   const [stats, setStats] = useState({ total: 0, sold: 0 })
   const [tournaments, setTournaments] = useState<Tournament[]>([])
+  const [teamCounts, setTeamCounts] = useState<Record<string, number>>({})
 
   const [showSplash, setShowSplash] = useState(true)
 
   useEffect(() => {
-    Promise.all([getSettings(), getPlayers(), getTournaments()]).then(([s, p, tr]) => {
+    Promise.all([getSettings(), getPlayers(), getTournaments()]).then(async ([s, p, tr]) => {
       setSettings(s); setTournaments(tr)
       setStats({ total: p.length, sold: p.filter((x: any) => x.status === 'sold').length })
+
+      const counts: Record<string, number> = {}
+      await Promise.all(tr.map(async t => {
+        counts[t.id] = await getTeamCount(t.id)
+      }))
+      setTeamCounts(counts)
     })
   }, [])
 
@@ -170,27 +177,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ── Ticker ──────────────────────────────────────────────────── */}
-      <div className="bg-saffron-600/50 backdrop-blur text-white py-2 text-[10px] sm:text-xs font-bold uppercase tracking-[0.2em] text-center border-y border-white/10 overflow-hidden whitespace-nowrap">
-        <div className="animate-marquee inline-block">
-          Player Auction Hub &nbsp;•&nbsp; India's Dedicated Digital Platform for Cricket Auctions &nbsp;•&nbsp; પ્રોફેશનલ ઓક્શન પ્લેટફોર્મ &nbsp;•&nbsp; {settings.auctionTitle || 'Cricket Auction 2026'} &nbsp;•&nbsp; {stats.total} Players Registered &nbsp;•&nbsp; {stats.sold} Players Sold &nbsp;•&nbsp; {tournaments.length} Tournaments Registered &nbsp;•&nbsp; Login to participate in Live Auction &nbsp;•&nbsp; playerauctionhub.in &nbsp;•&nbsp; 🏆
-        </div>
-      </div>
-
-      {/* ── Stats strip ─────────────────────────────────────────────── */}
-      <section className="bg-white border-b border-stone-200 py-5">
-        <div className="max-w-3xl mx-auto px-4 grid grid-cols-3 gap-4 text-center">
-          {[['👤', stats.total, 'Players'], ['🏆', stats.sold, 'Sold'], ['🏆', tournaments.length, 'Tournaments']].map(([ic, v, l]) => (
-            <div key={l as string} className="flex flex-col items-center">
-              <span className="text-2xl mb-0.5">{ic}</span>
-              <span className="text-2xl font-extrabold text-stone-800">{v}</span>
-              <span className="text-xs text-stone-400 font-semibold">{l}</span>
-            </div>
-          ))}
-        </div>
-      </section>
-
-
+      {/* ── Ticker & Stats blocks removed based on user request ── */}
       {/* ── Tournaments ──────────────────────────────────────────── */}
       <section id="tournaments" className="py-16 px-4">
         <div className="max-w-4xl mx-auto">
@@ -238,14 +225,14 @@ export default function Home() {
                         </div>
                       </div>
 
-                      {/* Player stats */}
+                      {/* Detailed Team and Player stats */}
                       <div className="grid grid-cols-2 gap-2 mb-3">
                         <div className="bg-stone-50 rounded-lg p-2.5 text-center">
-                          <div className="text-xs text-stone-400">Players Required</div>
-                          <div className="font-extrabold text-saffron-600 text-xl">{t.totalPlayersRequired}</div>
+                          <div className="text-xs text-stone-400">Teams</div>
+                          <div className="font-extrabold text-blue-600 text-xl">{teamCounts[t.id] || 0}</div>
                         </div>
                         <div className="bg-stone-50 rounded-lg p-2.5 text-center">
-                          <div className="text-xs text-stone-400">Registered</div>
+                          <div className="text-xs text-stone-400">Players</div>
                           <div className="font-extrabold text-green-600 text-xl">{t.registeredPlayers || 0}</div>
                         </div>
                       </div>
