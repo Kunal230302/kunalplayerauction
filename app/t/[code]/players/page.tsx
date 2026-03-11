@@ -8,61 +8,57 @@ import { uploadToCloudinary } from '@/lib/cloudinary'
 import { FiArrowLeft, FiUpload, FiPlus, FiX, FiCamera } from 'react-icons/fi'
 import toast from 'react-hot-toast'
 
+import { UAParser } from 'ua-parser-js'
+
 const getDeviceInfo = async () => {
   const userAgent = navigator.userAgent
   const platform = navigator.platform
   let deviceName = 'Unknown Device'
 
-  // Try modern Client Hints API (gives exact models like "vivo V30" on Chrome/Android)
+  // 1. Try standard UAParser first for deep model dictionary detection (gives exact models like Samsung Galaxy S21 Ultra)
   try {
-    const navAny = navigator as any
-    if (navAny.userAgentData && navAny.userAgentData.getHighEntropyValues) {
-      const hd = await navAny.userAgentData.getHighEntropyValues(['model', 'platform'])
-      if (hd.model) {
-        deviceName = hd.model
-        if (hd.platform) deviceName = `${hd.platform} ${hd.model}`
-      }
+    const parser = new UAParser(userAgent)
+    const result = parser.getResult()
+    if (result.device && result.device.vendor && result.device.model) {
+      deviceName = `${result.device.vendor} ${result.device.model}`
+    } else if (result.device && result.device.model) {
+      deviceName = result.device.model
     }
-  } catch (e) { }
+  } catch(e) {}
 
-  // Fallback to User-Agent parsing if Client Hints failed or wasn't available
-  if (deviceName === 'Unknown Device') {
-    if (userAgent.match(/iPhone/i)) {
-      deviceName = 'iPhone'
-      // Try to guess iPhone model roughly
-      if (typeof screen !== 'undefined') {
-        // iPhone 16 Series
-        if (screen.width === 440 && screen.height === 956) deviceName = 'iPhone 16 Pro Max'
-        else if (screen.width === 402 && screen.height === 874) deviceName = 'iPhone 16 Pro'
-        else if (screen.width === 430 && screen.height === 932) deviceName = 'iPhone 16 Plus / 15 Pro Max'
-        else if (screen.width === 393 && screen.height === 852) deviceName = 'iPhone 16 / 15 Pro'
-        else if (screen.width === 428 && screen.height === 926) deviceName = 'iPhone 13/14 Pro Max'
-        else if (screen.width === 390 && screen.height === 844) deviceName = 'iPhone 13/14'
+  // 2. Try modern Client Hints API (Chrome Android 100+ strips UA, this gets real model)
+  if (deviceName === 'Unknown Device' || deviceName.includes('K')) {
+    try {
+      const navAny = navigator as any
+      if (navAny.userAgentData && navAny.userAgentData.getHighEntropyValues) {
+        const hd = await navAny.userAgentData.getHighEntropyValues(['model', 'platform', 'brands'])
+        if (hd.model) {
+          let brand = ''
+          if (hd.brands && Array.isArray(hd.brands)) {
+            brand = hd.brands.find((b:any) => !b.brand.includes('Not') && !b.brand.includes('Chromium'))?.brand || ''
+          }
+          deviceName = brand ? `${brand} ${hd.model}` : hd.model
+          if (hd.platform && !brand && deviceName === hd.model) deviceName = `${hd.platform} ${hd.model}`
+        }
       }
-    }
+    } catch (e) { }
+  }
+
+  // 3. Fallback manual regex if both above fail
+  if (deviceName === 'Unknown Device' || deviceName.includes('K')) {
+    if (userAgent.match(/iPhone/i)) deviceName = 'iPhone'
     else if (userAgent.match(/iPad/i)) deviceName = 'iPad'
     else if (userAgent.match(/Android/i)) {
-      // Improved regex to better capture the actual manufacturer and model from standard Android User Agents
-      const m = userAgent.match(/Android[\s\d\.]+;\s*([^;)]+)(?:\s+Build)?/i)
+      const m = userAgent.match(/Android[\s\d\.]+;\s*([^;)]+)/i)
       if (m && m[1]) {
-        let rawModel = m[1].trim()
-        
-        // Sometimes the UA string structure includes 'wv' for webviews or language codes 'en-us' etc. Clean these up.
-        rawModel = rawModel.replace(/^\w{2}-\w{2}\s*;\s*/i, '').trim() 
-        rawModel = rawModel.replace(/\swv$/i, '').trim()
-        
-        if (rawModel && rawModel !== 'K' && !rawModel.includes('Android')) {
-           deviceName = rawModel
-        } else {
-           deviceName = 'Android Device'
-        }
+        let rawModel = m[1].trim().replace(/^\w{2}-\w{2}\s*;\s*/i, '').replace(/\swv$/i, '').trim()
+        deviceName = (rawModel && rawModel !== 'K' && !rawModel.includes('Android')) ? rawModel : 'Android Device'
       } else {
         deviceName = 'Android Device'
       }
     }
     else if (userAgent.match(/Windows/i)) deviceName = 'Windows PC'
     else if (userAgent.match(/Mac/i)) deviceName = 'Mac'
-    else if (userAgent.match(/Linux/i)) deviceName = 'Linux PC'
   }
 
   const deviceId = btoa(userAgent + platform + screen.width + screen.height).slice(0, 24)
