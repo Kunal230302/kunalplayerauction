@@ -124,15 +124,15 @@ export default function Home() {
       </header>
 
       {/* ── Hero ────────────────────────────────────────────────────── */}
-      <section className="relative pt-14 overflow-hidden">
+      <section className="relative pt-14 flex flex-col justify-center min-h-[80vh] overflow-hidden">
         {/* Layered bg */}
-        <div className="relative h-[80vh] min-h-[600px] overflow-hidden">
+        <div className="absolute inset-0 -z-10">
           <div className="absolute inset-0 bg-gradient-to-br from-orange-400 via-orange-500 to-orange-600" />
           <div className="absolute inset-0 bg-gradient-to-b from-orange-500/80 via-orange-400/60 to-orange-600/90" />
         </div>
         <div className="absolute bottom-0 left-0 right-0 h-16 bg-stone-50" style={{ clipPath: 'ellipse(55% 100% at 50% 100%)' }} />
 
-        <div className="relative z-10 max-w-5xl mx-auto px-4 py-20 sm:py-24 text-stone-900 text-center">
+        <div className="relative z-10 max-w-5xl mx-auto px-4 py-20 sm:py-24 text-stone-900 text-center w-full">
           <div className="inline-flex items-center gap-2 border border-stone-900/20 bg-white/20 backdrop-blur-md rounded-full px-5 py-2 text-xs font-bold tracking-[0.2em] uppercase mb-8 text-stone-900 shadow-xl">
             🏆 India's Dedicated Digital Platform for Cricket Auctions
           </div>
