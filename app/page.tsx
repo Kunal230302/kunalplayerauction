@@ -127,52 +127,52 @@ export default function Home() {
       <section className="relative pt-14 overflow-hidden">
         {/* Layered bg */}
         <div className="relative h-[80vh] min-h-[600px] overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-br from-orange-500 via-orange-600 to-orange-700" />
-          <div className="absolute inset-0 bg-gradient-to-b from-orange-600/80 via-orange-500/60 to-orange-700/90" />
+          <div className="absolute inset-0 bg-gradient-to-br from-orange-400 via-orange-500 to-orange-600" />
+          <div className="absolute inset-0 bg-gradient-to-b from-orange-500/80 via-orange-400/60 to-orange-600/90" />
         </div>
         <div className="absolute bottom-0 left-0 right-0 h-16 bg-stone-50" style={{ clipPath: 'ellipse(55% 100% at 50% 100%)' }} />
 
-        <div className="relative z-10 max-w-5xl mx-auto px-4 py-20 sm:py-24 text-white text-center">
-          <div className="inline-flex items-center gap-2 border border-white/20 bg-white/5 backdrop-blur-md rounded-full px-5 py-2 text-xs font-bold tracking-[0.2em] uppercase mb-8 text-saffron-300 shadow-xl">
+        <div className="relative z-10 max-w-5xl mx-auto px-4 py-20 sm:py-24 text-stone-900 text-center">
+          <div className="inline-flex items-center gap-2 border border-stone-900/20 bg-white/20 backdrop-blur-md rounded-full px-5 py-2 text-xs font-bold tracking-[0.2em] uppercase mb-8 text-stone-900 shadow-xl">
             🏆 India's Dedicated Digital Platform for Cricket Auctions
           </div>
 
-          <h1 className="text-6xl sm:text-7xl md:text-8xl font-extrabold text-white mb-6 drop-shadow-2xl">
+          <h1 className="text-6xl sm:text-7xl md:text-8xl font-black text-stone-900 mb-6 drop-shadow-xl" style={{ textShadow: '2px 2px 4px rgba(0,0,0,0.1)' }}>
             Player Auction Hub
           </h1>
 
           <div className="h-20 sm:h-32 md:h-40"></div> {/* Reduced spacer */}
 
-          <p className="max-w-3xl mx-auto text-stone-200 text-base sm:text-lg mb-10 leading-relaxed font-medium drop-shadow-md">
+          <p className="max-w-3xl mx-auto text-stone-900 text-base sm:text-lg mb-10 leading-relaxed font-bold drop-shadow-sm">
             Cricket Auction Hub is India’s most trusted digital platform designed specifically for cricket.
             We’ve removed the clutter of other sports to focus 100% on the gentleman's game.
             From local club leagues to massive corporate tournaments, manage your player bidding with professional-grade tools.
           </p>
 
           {settings.auctionDate && (
-            <p className="text-saffron-100 text-sm font-semibold mb-8 tracking-wide">
+            <p className="text-stone-900 text-sm font-black mb-8 tracking-wide">
               📅 {new Date(settings.auctionDate).toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
             </p>
           )}
 
           {settings.auctionDate && (
             <div className="mb-10">
-              <p className="text-saffron-200 text-xs font-bold tracking-widest uppercase mb-4">⏱ Auction Begins In</p>
+              <p className="text-stone-900 text-xs font-black tracking-widest uppercase mb-4">⏱ Auction Begins In</p>
               <Countdown target={settings.auctionDate} />
             </div>
           )}
 
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
             <Link href="/login" onClick={gavel.trigger}
-              className="bg-white text-saffron-600 font-extrabold px-8 py-4 rounded-2xl hover:bg-saffron-50 transition-all shadow-xl hover:shadow-2xl hover:-translate-y-0.5 text-base active:scale-95">
+              className="bg-stone-900 text-white font-extrabold px-8 py-4 rounded-2xl hover:bg-stone-800 transition-all shadow-xl hover:shadow-2xl hover:-translate-y-0.5 text-base active:scale-95">
               🏏 Enter Auction Room
             </Link>
             <Link href="/register-tournament" onClick={gavel.trigger}
-              className="bg-white/20 backdrop-blur border-2 border-white/50 text-white font-bold px-8 py-4 rounded-2xl hover:bg-white/30 transition-all text-base">
+              className="bg-white/30 backdrop-blur border-2 border-stone-900/50 text-stone-900 font-extrabold px-8 py-4 rounded-2xl hover:bg-white/40 transition-all text-base shadow-lg">
               🏆 Register Tournament
             </Link>
             <a href="#tournaments" onClick={gavel.trigger}
-              className="border-2 border-white/30 text-white/80 font-bold px-8 py-4 rounded-2xl hover:bg-white/10 transition-all text-base">
+              className="border-2 border-stone-900/30 text-stone-900 font-bold px-8 py-4 rounded-2xl hover:bg-white/20 transition-all text-base shadow-sm">
               View Tournaments ↓
             </a>
           </div>

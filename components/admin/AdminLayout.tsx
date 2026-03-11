@@ -6,15 +6,15 @@ import { FiGrid, FiUsers, FiShield, FiZap, FiUserPlus, FiSettings, FiMenu, FiLog
 import { useAuth } from '@/lib/auth'
 
 const NAV = [
-  { href:'/admin/dashboard', icon:FiGrid,     label:'Dashboard' },
-  { href:'/admin/players',   icon:FiUsers,    label:'Players' },
-  { href:'/admin/teams/dashboard', icon:FiShield, label:'Teams' },
-  { href:'/admin/tournaments', icon:FiAward,  label:'Tournaments' },
-  { href:'/admin/auction',   icon:FiZap,      label:'Live Auction', live:true },
-  { href:'/team-balance',    icon:FiTrendingUp, label:'Team Balance' },
-  { href:'/admin/users',     icon:FiUserPlus, label:'User Accounts' },
-  { href:'/admin/devices',   icon:FiSmartphone, label:'Devices' },
-  { href:'/admin/settings',  icon:FiSettings, label:'Settings' },
+  { href: '/admin/dashboard', icon: FiGrid, label: 'Dashboard' },
+  { href: '/admin/players', icon: FiUsers, label: 'Players' },
+  { href: '/admin/teams/dashboard', icon: FiShield, label: 'Teams' },
+  { href: '/admin/tournaments', icon: FiAward, label: 'Tournaments' },
+  { href: '/admin/auction', icon: FiZap, label: 'Live Auction', live: true },
+  { href: '/team-balance', icon: FiTrendingUp, label: 'Team Balance' },
+  { href: '/admin/users', icon: FiUserPlus, label: 'User Accounts' },
+  { href: '/admin/devices', icon: FiSmartphone, label: 'Devices' },
+  { href: '/admin/settings', icon: FiSettings, label: 'Settings' },
 ]
 
 function Sidebar({ close }: { close?: () => void }) {
@@ -35,7 +35,7 @@ function Sidebar({ close }: { close?: () => void }) {
             <div className="text-[10px] text-stone-400 font-medium mt-0.5">Admin Panel</div>
           </div>
         </Link>
-        {close && <button onClick={close} className="p-1 text-stone-400 hover:text-stone-600 lg:hidden"><FiX size={18}/></button>}
+        {close && <button onClick={close} className="p-1 text-stone-400 hover:text-stone-600 lg:hidden"><FiX size={18} /></button>}
       </div>
 
       {/* Nav */}
@@ -46,11 +46,11 @@ function Sidebar({ close }: { close?: () => void }) {
           return (
             <Link key={item.href} href={item.href} onClick={close}
               className={`nav-link ${active ? 'active' : ''}`}>
-              <Icon size={16}/>
+              <Icon size={16} />
               <span className="flex-1 text-sm">{item.label}</span>
               {item.live && (
                 <span className="flex items-center gap-1 shrink-0">
-                  <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse"/>
+                  <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse" />
                   <span className="text-[10px] font-extrabold text-red-500">LIVE</span>
                 </span>
               )}
@@ -58,7 +58,7 @@ function Sidebar({ close }: { close?: () => void }) {
           )
         })}
         <div className="pt-2 border-t border-stone-100 mt-2">
-          <Link href="/" onClick={close} className="nav-link"><FiHome size={16}/><span className="text-sm">View Website</span></Link>
+          <Link href="/" onClick={close} className="nav-link"><FiHome size={16} /><span className="text-sm">View Website</span></Link>
         </div>
         <div className="pt-1 border-t border-stone-100 mt-1">
           <p className="px-3 pt-1 pb-0.5 text-[9px] text-stone-400 font-bold uppercase tracking-widest">Overlays</p>
@@ -73,10 +73,10 @@ function Sidebar({ close }: { close?: () => void }) {
         <p className="text-[9px] text-stone-400 font-bold uppercase tracking-widest mb-1.5 text-center">Built by</p>
         <div className="space-y-1">
           <a href="https://instagram.com/kunallll2303" target="_blank" className="flex items-center gap-1.5 text-xs font-semibold text-saffron-500 hover:text-saffron-700 transition-colors">
-            <FiInstagram size={11}/> Kunal Kotak · @kunallll2303
+            <FiInstagram size={11} /> Kunal Kotak · @kunallll2303
           </a>
           <a href="https://instagram.com/yash_jani_" target="_blank" className="flex items-center gap-1.5 text-xs font-semibold text-blue-500 hover:text-blue-700 transition-colors">
-            <FiInstagram size={11}/> Yash Jani · @yash_jani_
+            <FiInstagram size={11} /> Yash Jani · @yash_jani_
           </a>
         </div>
       </div>
@@ -92,7 +92,7 @@ function Sidebar({ close }: { close?: () => void }) {
         </div>
         <button onClick={async () => { await logout(); router.push('/login') }}
           className="p-1.5 text-stone-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all">
-          <FiLogOut size={15}/>
+          <FiLogOut size={15} />
         </button>
       </div>
     </div>
@@ -104,7 +104,7 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
   const path = usePathname()
   const router = useRouter()
   const { appUser, loading } = useAuth()
-  const title = NAV.find(n => path.startsWith(n.href))?.label || path.split('/').pop()?.replace(/-/g,' ') || 'Admin'
+  const title = NAV.find(n => path.startsWith(n.href))?.label || path.split('/').pop()?.replace(/-/g, ' ') || 'Admin'
 
   // Auth guard: redirect non-admin users
   useEffect(() => {
@@ -133,13 +133,13 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
   return (
     <div className="flex h-screen bg-stone-50 overflow-hidden">
       {/* Desktop sidebar */}
-      <aside className="hidden lg:block w-60 shrink-0 h-full overflow-y-auto"><Sidebar/></aside>
+      <aside className="hidden lg:block w-60 shrink-0 h-full overflow-y-auto"><Sidebar /></aside>
 
       {/* Mobile sidebar */}
       {mob && (
         <>
-          <div className="fixed inset-0 bg-black/40 z-40 lg:hidden" onClick={() => setMob(false)}/>
-          <div className="fixed inset-y-0 left-0 w-60 z-50 shadow-2xl"><Sidebar close={() => setMob(false)}/></div>
+          <div className="fixed inset-0 bg-black/40 z-40 lg:hidden" onClick={() => setMob(false)} />
+          <div className="fixed inset-y-0 left-0 w-60 z-50 shadow-2xl"><Sidebar close={() => setMob(false)} /></div>
         </>
       )}
 
@@ -147,7 +147,7 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
       <div className="flex-1 flex flex-col overflow-hidden">
         <header className="h-14 bg-white border-b-2 border-stone-100 px-4 flex items-center gap-3 shrink-0">
           <button className="lg:hidden p-1.5 text-stone-500 hover:bg-stone-100 rounded-lg" onClick={() => setMob(true)}>
-            <FiMenu size={20}/>
+            <FiMenu size={20} />
           </button>
           <h1 className="flex-1 text-base font-extrabold text-stone-700 capitalize">{title}</h1>
           <span className="b-orange hidden sm:flex text-xs">Admin</span>
