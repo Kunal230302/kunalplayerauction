@@ -42,8 +42,23 @@ const getDeviceInfo = async () => {
     }
     else if (userAgent.match(/iPad/i)) deviceName = 'iPad'
     else if (userAgent.match(/Android/i)) {
-      const m = userAgent.match(/Android\s+[\d.]+;\s*([^;)]+)/)
-      deviceName = m && m[1] && m[1].trim() !== 'K' && !m[1].includes('Android') ? m[1].trim() : 'Android Device'
+      // Improved regex to better capture the actual manufacturer and model from standard Android User Agents
+      const m = userAgent.match(/Android[\s\d\.]+;\s*([^;)]+)(?:\s+Build)?/i)
+      if (m && m[1]) {
+        let rawModel = m[1].trim()
+        
+        // Sometimes the UA string structure includes 'wv' for webviews or language codes 'en-us' etc. Clean these up.
+        rawModel = rawModel.replace(/^\w{2}-\w{2}\s*;\s*/i, '').trim() 
+        rawModel = rawModel.replace(/\swv$/i, '').trim()
+        
+        if (rawModel && rawModel !== 'K' && !rawModel.includes('Android')) {
+           deviceName = rawModel
+        } else {
+           deviceName = 'Android Device'
+        }
+      } else {
+        deviceName = 'Android Device'
+      }
     }
     else if (userAgent.match(/Windows/i)) deviceName = 'Windows PC'
     else if (userAgent.match(/Mac/i)) deviceName = 'Mac'

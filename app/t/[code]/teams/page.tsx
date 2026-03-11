@@ -67,20 +67,20 @@ const getDeviceInfo = async () => {
       deviceName = deviceModel
     }
     else if (userAgent.match(/Android/i)) {
-      const androidMatch = userAgent.match(/Android\s+([\d.]+);\s*([^;)]+)/)
-      if (androidMatch) {
-        const deviceInfo = androidMatch[2].trim()
-        if (deviceInfo.includes('Samsung') || deviceInfo.includes('SM-')) {
-          const samsungModel = deviceInfo.match(/SM-[A-Z0-9]+/)
-          deviceModel = samsungModel ? `Samsung ${samsungModel[0]}` : deviceInfo
-        } else if (deviceInfo.includes('Pixel')) {
-          deviceModel = 'Google Pixel'
-        } else if (deviceInfo !== 'K') {
-          deviceModel = deviceInfo
+      // Improved regex to better capture the actual manufacturer and model from standard Android User Agents
+      const m = userAgent.match(/Android[\s\d\.]+;\s*([^;)]+)(?:\s+Build)?/i)
+      if (m && m[1]) {
+        let rawModel = m[1].trim()
+        
+        // Clean up common noise in UA strings
+        rawModel = rawModel.replace(/^\w{2}-\w{2}\s*;\s*/i, '').trim() 
+        rawModel = rawModel.replace(/\swv$/i, '').trim()
+        
+        if (rawModel && rawModel !== 'K' && !rawModel.includes('Android')) {
+           deviceName = rawModel
         } else {
-          deviceModel = 'Android Device'
+           deviceName = 'Android Device'
         }
-        deviceName = deviceModel
       } else {
         deviceName = 'Android Device'
       }
