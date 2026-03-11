@@ -4,19 +4,31 @@ export async function generateTeamPDF(team: any, players: any[]) {
   await import('jspdf-autotable')
   const doc = new jsPDF()
 
+  // Load logo
+  const logoImg = new Image()
+  logoImg.src = '/logo.png'
+  await new Promise(resolve => { logoImg.onload = resolve; logoImg.onerror = resolve }) // ignore errors
+
   // Orange header bar
   doc.setFillColor(249, 115, 22)
   doc.rect(0, 0, 210, 38, 'F')
 
+  let startX = 14
+  if (logoImg.width) {
+    // scale logo nicely
+    doc.addImage(logoImg, 'PNG', 14, 6, 20, 20)
+    startX = 38
+  }
+
   doc.setTextColor(255, 255, 255)
   doc.setFont('helvetica', 'bold')
   doc.setFontSize(18)
-  doc.text('PlayerAuctionHub', 14, 14)
+  doc.text('PlayerAuctionHub', startX, 14)
 
   doc.setFontSize(9)
   doc.setFont('helvetica', 'normal')
-  doc.text('playerauctionhub.in  |  Local Cricket Auction', 14, 22)
-  doc.text('Made by Kunal Kotak (@kunallll2303) & Yash Jani (@yash_jani_)', 14, 30)
+  doc.text('playerauctionhub.in  |  Local Cricket Auction', startX, 22)
+  doc.text('Made by Kunal & Yash', startX, 30)
 
   // Team block
   doc.setFillColor(28, 25, 23)
