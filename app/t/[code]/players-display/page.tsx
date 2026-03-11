@@ -110,38 +110,24 @@ export default function PlayersDisplayPage() {
           {displayedPlayers.map((player, index) => (
             <div
               key={player.id}
-              className="bg-white rounded-lg shadow-sm border border-gray-200 p-2 flex flex-col items-center text-center hover:shadow-md transition-shadow"
+              className="bg-black rounded-lg shadow-sm border border-gray-700 p-2 flex flex-col items-center text-center hover:shadow-md transition-shadow"
             >
-              {/* Player Photo - Larger size */}
-              <div className="w-16 h-16 flex-shrink-0 bg-gradient-to-br from-gray-100 to-gray-200 rounded-full overflow-hidden mb-2 border-2 border-gray-300">
-                {player.photoURL ? (
-                  <img
-                    src={player.photoURL}
-                    alt={`${player.name} ${player.surname}`}
-                    className="w-full h-full object-cover"
-                    onError={(e) => { (e.target as HTMLImageElement).style.display = 'none' }}
-                  />
-                ) : (
-                  <DefaultAvatar />
-                )}
-              </div>
-
               {/* Player Info */}
               <div className="w-full">
-                <div className="text-xs text-gray-500 font-medium mb-0.5">
+                <div className="text-xs text-gray-400 font-medium mb-0.5">
                   No: {getPlayerNumber(index)}
                 </div>
-                <h3 className="text-xs font-bold text-gray-900 truncate leading-tight">
+                <h3 className="text-xs font-bold text-white truncate leading-tight">
                   {player.name}
                 </h3>
-                <h4 className="text-xs font-bold text-gray-900 truncate leading-tight">
+                <h4 className="text-xs font-bold text-white truncate leading-tight">
                   {player.surname}
                 </h4>
-                <div className="text-[10px] text-gray-600 mt-0.5">
+                <div className="text-[10px] text-gray-300 mt-0.5">
                   Age: {player.age || 'N/A'} YR
                 </div>
                 {player.role && (
-                  <div className="text-[10px] text-gray-500 mt-0.5 truncate">
+                  <div className="text-[10px] text-gray-400 mt-0.5 truncate">
                     {player.role}
                   </div>
                 )}

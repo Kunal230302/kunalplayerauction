@@ -2,7 +2,7 @@
 import { ReactNode, useState, useEffect } from 'react'
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
-import { FiGrid, FiUsers, FiShield, FiZap, FiUserPlus, FiSettings, FiMenu, FiLogOut, FiInstagram, FiHome, FiX, FiAward, FiTrendingUp } from 'react-icons/fi'
+import { FiGrid, FiUsers, FiShield, FiZap, FiUserPlus, FiSettings, FiMenu, FiLogOut, FiInstagram, FiHome, FiX, FiAward, FiTrendingUp, FiSmartphone } from 'react-icons/fi'
 import { useAuth } from '@/lib/auth'
 
 const NAV = [
@@ -13,6 +13,7 @@ const NAV = [
   { href:'/admin/auction',   icon:FiZap,      label:'Live Auction', live:true },
   { href:'/team-balance',    icon:FiTrendingUp, label:'Team Balance' },
   { href:'/admin/users',     icon:FiUserPlus, label:'User Accounts' },
+  { href:'/admin/devices',   icon:FiSmartphone, label:'Devices' },
   { href:'/admin/settings',  icon:FiSettings, label:'Settings' },
 ]
 

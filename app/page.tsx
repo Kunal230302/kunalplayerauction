@@ -105,7 +105,7 @@ export default function Home() {
         <div className="max-w-5xl mx-auto h-14 px-4 flex items-center justify-between">
           <div className="flex items-center gap-2.5">
             <div className="w-8 h-8 rounded-lg flex items-center justify-center overflow-hidden">
-              <img src="/icon.png" alt="Logo" className="w-full h-full object-contain" />
+              <img src="/logo.png" alt="Logo" className="w-full h-full object-contain" />
             </div>
             <div>
               <div className="font-extrabold text-saffron-600 text-sm leading-none tracking-tight">PlayerAuctionHub</div>
@@ -126,9 +126,9 @@ export default function Home() {
       {/* ── Hero ────────────────────────────────────────────────────── */}
       <section className="relative pt-14 overflow-hidden">
         {/* Layered bg */}
-        <div className="absolute inset-0">
-          <img src="/hero-main.jpg" alt="Auction Hero" className="w-full h-full object-cover object-center" />
-          <div className="absolute inset-0 bg-gradient-to-br from-stone-900/90 via-stone-900/40 to-stone-900/80" />
+        <div className="relative h-[80vh] min-h-[600px] overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-br from-orange-500 via-orange-600 to-orange-700" />
+          <div className="absolute inset-0 bg-gradient-to-b from-orange-600/80 via-orange-500/60 to-orange-700/90" />
         </div>
         <div className="absolute bottom-0 left-0 right-0 h-16 bg-stone-50" style={{ clipPath: 'ellipse(55% 100% at 50% 100%)' }} />
 
@@ -137,9 +137,11 @@ export default function Home() {
             🏆 India's Dedicated Digital Platform for Cricket Auctions
           </div>
 
-          <h1 className="text-5xl sm:text-6xl md:text-7xl font-black leading-tight mb-6 drop-shadow-2xl tracking-tighter">
+          <h1 className="text-6xl sm:text-7xl md:text-8xl font-extrabold text-white mb-6 drop-shadow-2xl">
             Player Auction Hub
           </h1>
+
+          <div className="h-20 sm:h-32 md:h-40"></div> {/* Reduced spacer */}
 
           <p className="max-w-3xl mx-auto text-stone-200 text-base sm:text-lg mb-10 leading-relaxed font-medium drop-shadow-md">
             Cricket Auction Hub is India’s most trusted digital platform designed specifically for cricket.
@@ -297,7 +299,7 @@ export default function Home() {
           <div className="grid sm:grid-cols-3 gap-5">
             {[
               { n: '01', e: '📋', t: 'Admin Puts Player', d: 'Tournament admin calls each player for auction. Player photo, name and role shows on all screens.' },
-              { n: '02', e: <img src="/icon.png" className="w-6 h-6 object-contain inline-block" />, t: 'Teams Bid Points', d: '4 teams click their bid buttons. Points increase with each bid. Highest bidder leads the auction.' },
+              { n: '02', e: <img src="/logo.png" className="w-6 h-6 object-contain inline-block" />, t: 'Teams Bid Points', d: '4 teams click their bid buttons. Points increase with each bid. Highest bidder leads the auction.' },
               { n: '03', e: '🏆', t: 'SOLD! Celebrate!', d: 'Timer ends. Player is SOLD to the highest bidding team. Confetti celebration! PDF report generated.' },
             ].map(s => (
               <div key={s.n} className="bg-saffron-50 border-2 border-saffron-100 rounded-2xl p-6 text-center">
@@ -451,7 +453,7 @@ export default function Home() {
         <div className="max-w-4xl mx-auto text-center">
           <div className="flex items-center justify-center gap-3 mb-4">
             <div className="w-10 h-10 rounded-xl overflow-hidden shadow-sm">
-              <img src="/icon.png" alt="Logo" className="w-full h-full object-contain" />
+              <img src="/logo.png" alt="Logo" className="w-full h-full object-contain" />
             </div>
             <span className="font-extrabold text-white text-xl tracking-tight">PlayerAuctionHub</span>
           </div>
@@ -460,7 +462,7 @@ export default function Home() {
             Professional Auction Platform | પ્રોફેશનલ ઓક્શન પ્લેટફોર્મ
           </p>
           <p className="text-sm font-semibold">
-            Made with <img src="/icon.png" className="w-4 h-4 inline-block mx-0.5" alt="🏏" /> by{' '}
+            Made with <img src="/logo.png" className="w-4 h-4 inline-block mx-0.5" alt="🏏" /> by{' '}
             <span className="text-saffron-400">Kunal Kotak</span> &amp;{' '}
             <span className="text-blue-400">Yash Jani</span>
           </p>
