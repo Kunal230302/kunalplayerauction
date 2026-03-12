@@ -76,9 +76,19 @@ export default function Home() {
   const [showSplash, setShowSplash] = useState(true)
 
   useEffect(() => {
-    Promise.all([getSettings(), getPlayers(), getTournaments()]).then(async ([s, p, tr]) => {
+    Promise.all([getSettings(), getTournaments()]).then(async ([s, tr]) => {
       setSettings(s); setTournaments(tr)
-      setStats({ total: p.length, sold: p.filter((x: any) => x.status === 'sold').length })
+      
+      // Get live player count for each tournament
+      const updatedTournaments = await Promise.all(tr.map(async t => {
+        const players = await getPlayers(t.id)
+        return { ...t, registeredPlayers: players.length }
+      }))
+      setTournaments(updatedTournaments)
+
+      // Get global stats
+      const allPlayers = await getPlayers()
+      setStats({ total: allPlayers.length, sold: allPlayers.filter((x: any) => x.status === 'sold').length })
 
       const counts: Record<string, number> = {}
       await Promise.all(tr.map(async t => {
@@ -442,8 +452,63 @@ export default function Home() {
             </div>
           </div>
 
-          <p className="text-stone-700 text-lg sm:text-xl font-bold leading-relaxed max-w-3xl mx-auto bg-gradient-to-r from-stone-800 to-stone-600 bg-clip-text text-transparent">
-            At Player Auction Hub, we are committed to revolutionizing the way cricket auctions are conducted in India. Whether you are a league organizer or a player, our platform makes the entire process more exciting, efficient, and professional. 🏏🚀
+          {/* Team Section */}
+          <div className="bg-gradient-to-br from-stone-50 to-stone-100 rounded-3xl p-8 sm:p-12 border border-stone-200 shadow-sm mb-12">
+            <h3 className="text-2xl font-extrabold text-stone-800 mb-8 text-center">Meet Our Team</h3>
+            <div className="grid md:grid-cols-2 gap-8">
+              {/* CEO */}
+              <div className="bg-white rounded-2xl p-6 shadow-sm border border-stone-200">
+                <div className="flex items-center gap-4 mb-4">
+                  <div className="w-16 h-16 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center text-white text-2xl font-bold">
+                    YJ
+                  </div>
+                  <div>
+                    <h4 className="text-xl font-bold text-stone-800">Yash Jani</h4>
+                    <p className="text-blue-600 font-semibold">CEO & Partner</p>
+                  </div>
+                </div>
+                <p className="text-stone-600 leading-relaxed">
+                  Visionary leader with the revolutionary idea to digitize cricket auctions in India. 
+                  Yash identified the need for a professional auction platform that could handle 
+                  the complexity of cricket team selections with transparency and efficiency.
+                </p>
+                <div className="mt-4 pt-4 border-t border-stone-100">
+                  <p className="text-sm text-stone-500 italic">
+                    "My vision was to create a platform where every cricket player gets fair value 
+                    and every team owner can build their dream team with confidence."
+                  </p>
+                </div>
+              </div>
+
+              {/* Developer */}
+              <div className="bg-white rounded-2xl p-6 shadow-sm border border-stone-200">
+                <div className="flex items-center gap-4 mb-4">
+                  <div className="w-16 h-16 rounded-full bg-gradient-to-br from-saffron-500 to-saffron-600 flex items-center justify-center text-white text-2xl font-bold">
+                    KK
+                  </div>
+                  <div>
+                    <h4 className="text-xl font-bold text-stone-800">Kunal Kotak</h4>
+                    <p className="text-saffron-600 font-semibold">Website Developer</p>
+                  </div>
+                </div>
+                <p className="text-stone-600 leading-relaxed">
+                  Full-stack developer who transformed Yash's vision into reality. Kunal engineered 
+                  the complete auction system with real-time bidding, secure payments, and an intuitive 
+                  interface that makes complex auctions simple.
+                </p>
+                <div className="mt-4 pt-4 border-t border-stone-100">
+                  <p className="text-sm text-stone-500 italic">
+                    "I built this platform to handle thousands of concurrent bids while maintaining 
+                    the excitement and fairness of traditional cricket auctions."
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <p className="text-stone-700 text-lg sm:text-xl font-bold leading-relaxed max-w-3xl mx-auto bg-gradient-to-r from-stone-800 to-stone-600 bg-clip-text text-transparent mb-8">
+            Together, we're revolutionizing how cricket auctions are conducted in India, bringing 
+            transparency, efficiency, and professionalism to the gentleman's game.
           </p>
         </div>
       </section>
