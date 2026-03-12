@@ -3,7 +3,7 @@ export const dynamic = 'force-dynamic'
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { useParams } from 'next/navigation'
-import { getTournamentByCode, getTeams, getPlayers, addPlayer, Tournament, Team, Player } from '@/lib/db'
+import { getTournamentByCode, getTeams, getPlayers, addPlayer, Tournament, Team, Player, subPlayerCount } from '@/lib/db'
 import { uploadToCloudinary } from '@/lib/cloudinary'
 import { FiUsers, FiShield, FiMapPin, FiZap, FiCopy, FiUpload, FiPlus, FiX, FiCamera } from 'react-icons/fi'
 import toast from 'react-hot-toast'
@@ -178,6 +178,7 @@ export default function TournamentPage() {
   const [tournament, setTournament] = useState<Tournament | null>(null)
   const [teams, setTeams] = useState<Team[]>([])
   const [players, setPlayers] = useState<Player[]>([])
+  const [livePlayerCount, setLivePlayerCount] = useState<number | null>(null)
   const [loading, setLoading] = useState(true)
   const [notFound, setNotFound] = useState(false)
 
@@ -203,6 +204,15 @@ export default function TournamentPage() {
   }
 
   useEffect(() => { load() }, [code])
+
+  // Subscribe to live player count changes
+  useEffect(() => {
+    if (!tournament?.id) return
+    const unsub = subPlayerCount(tournament.id, (count) => {
+      setLivePlayerCount(count)
+    })
+    return () => unsub()
+  }, [tournament?.id])
 
   const copyCode = () => { navigator.clipboard.writeText(code); toast.success('Code copied!') }
   const sold = players.filter(p => p.status === 'sold').length
@@ -297,8 +307,9 @@ export default function TournamentPage() {
   )
 
   const t = tournament!
-  const pct = t.totalPlayersRequired > 0 ? Math.round((players.length / t.totalPlayersRequired) * 100) : 0
-  const isFull = t.totalPlayersRequired > 0 && players.length >= t.totalPlayersRequired
+  const currentPlayers = livePlayerCount ?? players.length
+  const pct = t.totalPlayersRequired > 0 ? Math.round((currentPlayers / t.totalPlayersRequired) * 100) : 0
+  const isFull = t.totalPlayersRequired > 0 && currentPlayers >= t.totalPlayersRequired
   const talukas = DISTRICT_TALUKAS[form.district] || []
 
   return (
@@ -326,7 +337,7 @@ export default function TournamentPage() {
           </div>
 
           <div className="grid grid-cols-3 gap-3 max-w-sm mx-auto">
-            {[['👤', players.length, 'Players'], ['🏆', sold, 'Sold'], ['🛡️', teams.length, 'Teams']].map(([ic, v, l]) => (
+            {[['👤', livePlayerCount ?? players.length, 'Players'], ['🏆', sold, 'Sold'], ['🛡️', teams.length, 'Teams']].map(([ic, v, l]) => (
               <div key={l as string} className="bg-white/10 backdrop-blur rounded-xl p-3 text-center">
                 <span className="text-lg">{ic}</span>
                 <div className="text-2xl font-extrabold">{v}</div>
@@ -372,6 +383,15 @@ export default function TournamentPage() {
               <div>
                 <h3 className="font-extrabold text-xl text-stone-800">👤 Register as Player</h3>
                 <p className="text-xs text-stone-400 mt-0.5">Fill all required fields to complete registration</p>
+                {t.totalPlayersRequired > 0 && (
+                  <p className="inline-flex mt-2 items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-bold bg-blue-100 text-blue-700">
+                    <span className="relative flex h-2 w-2">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
+                      <span className="relative inline-flex rounded-full h-2 w-2 bg-blue-500"></span>
+                    </span>
+                    Live Count: {currentPlayers} / {t.totalPlayersRequired} Registered
+                  </p>
+                )}
               </div>
               <button onClick={() => setShowForm(false)} className="p-2 text-stone-400 hover:bg-stone-100 rounded-lg"><FiX size={20} /></button>
             </div>

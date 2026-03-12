@@ -1,7 +1,7 @@
 import {
   collection, doc, getDocs, getDoc, addDoc, updateDoc,
   deleteDoc, query, orderBy, serverTimestamp, writeBatch,
-  increment, setDoc, where, limit
+  increment, setDoc, where, limit, onSnapshot
 } from 'firebase/firestore'
 import { ref, set, update, onValue, push, remove, get, off } from 'firebase/database'
 import { db, rtdb } from './firebase'
@@ -145,6 +145,12 @@ export const updatePlayer = (id: string, d: any, tournamentId?: string) => {
 export const deletePlayer = (id: string, tournamentId?: string) => {
   const path = tournamentId ? `tournaments/${tournamentId}/players/${id}` : `players/${id}`
   return deleteDoc(doc(db, path))
+}
+
+export const subPlayerCount = (tid: string, cb: (count: number) => void) => {
+  return onSnapshot(playersCol(tid), (snapshot) => {
+    cb(snapshot.size)
+  })
 }
 
 // ── TEAMS (tournament-scoped) ────────────────────────────────────────────────
