@@ -265,6 +265,14 @@ export const getAuctionResults = async (tournamentId?: string): Promise<any[]> =
   return s.docs.map(d => ({ id: d.id, ...d.data() }))
 }
 
+export const clearAuctionResults = async (tournamentId?: string) => {
+  const results = await getAuctionResults(tournamentId)
+  const batch = writeBatch(db)
+  const base = tournamentId ? `tournaments/${tournamentId}/auction_results` : 'auction_results'
+  results.forEach(r => batch.delete(doc(db, base, r.id)))
+  await batch.commit()
+}
+
 export const resetTournament = async (tid?: string) => {
   const [players, teams] = await Promise.all([getPlayers(tid), getTeams(tid)])
   const batch = writeBatch(db)
@@ -274,6 +282,8 @@ export const resetTournament = async (tid?: string) => {
   teams.forEach(t => batch.update(doc(db, tBase, t.id), { points: 0, playersBought: 0 }))
   await batch.commit()
   await remove(ref(rtdb, tid ? `tournaments/${tid}` : 'auction'))
+  // Clear auction results when resetting
+  await clearAuctionResults(tid)
 }
 
 // ── REMOTE BIDDING FUNCTIONS ────────────────────────────────────────────────

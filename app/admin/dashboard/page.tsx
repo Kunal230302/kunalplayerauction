@@ -3,7 +3,7 @@ export const dynamic = 'force-dynamic'
 import { useEffect, useState } from 'react'
 import AdminLayout from '@/components/admin/AdminLayout'
 import Link from 'next/link'
-import { getPlayers, getTournaments, getTeams, getAuctionResults } from '@/lib/db'
+import { getPlayers, getTournaments, getTeams, getAuctionResults, clearAuctionResults, updatePlayer } from '@/lib/db'
 import { FiRefreshCw, FiZap, FiAlertTriangle, FiDownload } from 'react-icons/fi'
 import toast from 'react-hot-toast'
 
@@ -190,7 +190,7 @@ export default function Dashboard() {
       return
     }
 
-    // Group by team
+    // Group by team and lookup player names
     const teamMap = new Map()
     auctionResults.forEach((result: any) => {
       const teamName = result.teamName || 'Unknown Team'
@@ -198,7 +198,15 @@ export default function Dashboard() {
         teamMap.set(teamName, { players: [], totalSpent: 0 })
       }
       const team = teamMap.get(teamName)
-      team.players.push(result)
+      
+      // Lookup player name from players array
+      const player = players.find((p: any) => p.id === result.playerId)
+      const playerName = player?.name || player?.playerName || result.playerName || result.playerId?.slice(0, 8) || 'Unknown'
+      
+      team.players.push({
+        ...result,
+        playerName: playerName
+      })
       team.totalSpent += result.points || 0
     })
 
@@ -429,7 +437,33 @@ export default function Dashboard() {
         {/* Registration Progress */}
         {players.length > 0 && (
           <div className="card p-5">
-            <h2 className="sec-title mb-3">Registration Progress</h2>
+            <div className="flex items-center justify-between mb-3">
+              <h2 className="sec-title">Registration Progress</h2>
+              {avail < players.length && (
+                <button 
+                  onClick={async () => {
+                    if (confirm('⚠️ Reset all players to available?')) {
+                      try {
+                        const targetTournaments = selectedTournament === 'all' ? tournaments : tournaments.filter(t => t.id === selectedTournament)
+                        for (const t of targetTournaments) {
+                          const tournamentPlayers = await getPlayers(t.id)
+                          for (const player of tournamentPlayers) {
+                            await updatePlayer(player.id, { status: 'available', soldTo: null, soldToName: null, soldPoints: null }, t.id)
+                          }
+                        }
+                        await load()
+                        toast.success(`All ${players.length} players now available! ✅`)
+                      } catch (e: any) {
+                        toast.error('Failed to reset: ' + e.message)
+                      }
+                    }
+                  }}
+                  className="btn-outline btn-sm gap-1.5 border-emerald-300 text-emerald-600 hover:bg-emerald-50"
+                >
+                  🔄 Reset All Available
+                </button>
+              )}
+            </div>
             <div className="h-4 bg-stone-100 rounded-full overflow-hidden flex">
               <div className="bg-emerald-400 h-full transition-all" style={{width:`${avail/players.length*100}%`}}/>
               <div className="bg-stone-200 h-full transition-all" style={{width:`${(players.length-avail)/players.length*100}%`}}/>
@@ -494,11 +528,50 @@ export default function Dashboard() {
                 {auctionResults.length} sold
               </span>
             </h2>
-            {auctionResults.length > 0 && (
-              <button onClick={printAuctionResults} className="btn-primary btn-sm gap-1.5 bg-orange-600 hover:bg-orange-700 border-orange-600">
-                🏆 Print Results PDF
-              </button>
-            )}
+            <div className="flex gap-2">
+              {auctionResults.length > 0 && (
+                <button onClick={printAuctionResults} className="btn-primary btn-sm gap-1.5 bg-orange-600 hover:bg-orange-700 border-orange-600">
+                  🏆 Print Results PDF
+                </button>
+              )}
+              {auctionResults.length > 0 && (
+                <button 
+                  onClick={async () => {
+                    if (confirm('⚠️ Are you sure? This will delete all auction results and reset all players to available!')) {
+                      try {
+                        // Clear auction results
+                        if (selectedTournament === 'all') {
+                          for (const t of tournaments) {
+                            await clearAuctionResults(t.id)
+                          }
+                        } else {
+                          await clearAuctionResults(selectedTournament)
+                        }
+                        
+                        // Reset all players to available
+                        const targetTournaments = selectedTournament === 'all' ? tournaments : tournaments.filter(t => t.id === selectedTournament)
+                        for (const t of targetTournaments) {
+                          const tournamentPlayers = await getPlayers(t.id)
+                          for (const player of tournamentPlayers) {
+                            // Reset ALL players to available, regardless of current status
+                            await updatePlayer(player.id, { status: 'available', soldTo: null, soldToName: null, soldPoints: null }, t.id)
+                          }
+                        }
+                        
+                        // Refresh data
+                        await load()
+                        toast.success('Auction reset! All players now available �')
+                      } catch (e: any) {
+                        toast.error('Failed to reset: ' + e.message)
+                      }
+                    }
+                  }} 
+                  className="btn-outline btn-sm gap-1.5 border-red-300 text-red-600 hover:bg-red-50"
+                >
+                  🗑️ Reset Auction
+                </button>
+              )}
+            </div>
           </div>
           
           {auctionResults.length === 0 ? (
@@ -532,16 +605,21 @@ export default function Dashboard() {
                     </div>
                     <div className="p-3">
                       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2">
-                        {players.map((player: any, idx: number) => (
-                          <div key={idx} className="flex items-center justify-between bg-stone-50 rounded-lg px-3 py-2">
-                            <span className="text-sm font-medium text-stone-700 truncate">
-                              {idx + 1}. {player.playerName || player.playerId?.slice(0, 8) || 'Unknown'}
-                            </span>
-                            <span className="text-sm font-bold text-emerald-600 ml-2">
-                              ₹{(player.points || 0).toLocaleString()}
-                            </span>
-                          </div>
-                        ))}
+                        {players.map((player: any, idx: number) => {
+                          // Lookup player name from players array
+                          const fullPlayer = players.find((p: any) => p.id === player.playerId)
+                          const playerName = fullPlayer?.name || fullPlayer?.playerName || player.playerName || player.playerId?.slice(0, 8) || 'Unknown'
+                          return (
+                            <div key={idx} className="flex items-center justify-between bg-stone-50 rounded-lg px-3 py-2">
+                              <span className="text-sm font-medium text-stone-700 truncate">
+                                {idx + 1}. {playerName}
+                              </span>
+                              <span className="text-sm font-bold text-emerald-600 ml-2">
+                                ₹{(player.points || 0).toLocaleString()}
+                              </span>
+                            </div>
+                          )
+                        })}
                       </div>
                     </div>
                   </div>
