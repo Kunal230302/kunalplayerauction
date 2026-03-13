@@ -4,7 +4,7 @@ import { useEffect, useRef, useState, useCallback, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 import AdminLayout from '@/components/admin/AdminLayout'
 import {
-  getPlayers, getTeams, getSettings, getTournaments,
+  getPlayers, getTeams, getSettings, getTournaments, clearAuctionResults, updatePlayer, updateTeam,
   setLive, updateLive, clearLive, clearBids,
   subLive, subBids, pushBid, markSold, markUnsold
 } from '@/lib/db'
@@ -345,6 +345,42 @@ function LiveAuctionInner() {
             <span className="text-stone-400 text-sm font-medium">{queue.length} players remaining</span>
           </div>
           <div className="flex gap-2">
+            <button 
+              onClick={async () => {
+                if (confirm('⚠️ Reset entire auction? This will clear all sold/unsold data, reset all players to available, and reset team points to 0!')) {
+                  try {
+                    // Clear auction results and bid history
+                    await clearAuctionResults(tournamentId || undefined)
+                    await clearBids(tournamentId || undefined)
+                    // Reset all players to available
+                    const allPlayers = await getPlayers(tournamentId || undefined)
+                    for (const player of allPlayers) {
+                      if (player.status !== 'available') {
+                        await updatePlayer(player.id, { status: 'available', soldTo: null, soldToName: null, soldPoints: null }, tournamentId || undefined)
+                      }
+                    }
+                    // Reset all team points to 0
+                    const allTeams = await getTeams(tournamentId || undefined)
+                    for (const team of allTeams) {
+                      await updateTeam(team.id, { points: 0, playersBought: 0 }, tournamentId || undefined)
+                    }
+                    // Refresh the queue
+                    const refreshed = await getPlayers(tournamentId || undefined)
+                    const available = refreshed.filter((x:any) => x.status === 'available' || x.status === 'unsold')
+                    setQueue(available)
+                    setQIdx(0)
+                    setPhase('idle')
+                    await clearLive(tournamentId || undefined)
+                    toast.success('Auction reset! All players available and team points reset to 0 🔄')
+                  } catch (e: any) {
+                    toast.error('Failed to reset: ' + e.message)
+                  }
+                }
+              }}
+              className="btn btn-sm border-2 border-red-200 text-red-600 hover:bg-red-50 gap-1.5"
+            >
+              <FiRefreshCw size={13}/> Reset Auction
+            </button>
             <button onClick={handleGeneratePDFs} disabled={genPdf} className="btn btn-sm border-2 border-stone-200 text-stone-600 hover:bg-stone-50 gap-1.5">
               <FiDownload size={13}/> Export PDFs
             </button>
@@ -436,6 +472,16 @@ function LiveAuctionInner() {
                         </div>
                       </div>
                       <div className="text-xs text-stone-400 font-semibold">seconds</div>
+                      
+                      {/* Overlay Link */}
+                      <a 
+                        href={`/overlay?tid=${tournamentId}`} 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="text-xs bg-saffron-100 text-saffron-700 px-2 py-1 rounded border border-saffron-200 hover:bg-saffron-200 transition-colors font-semibold"
+                      >
+                        📺 Open Overlay
+                      </a>
                     </div>
                   )}
                 </div>
@@ -504,11 +550,32 @@ function LiveAuctionInner() {
             <div className="card overflow-hidden">
               <div className="px-4 py-3 border-b-2 border-stone-100 flex items-center justify-between">
                 <h3 className="font-extrabold text-sm text-stone-700">Queue ({queue.length})</h3>
+                <span className="text-xs text-stone-400">Click # to start</span>
               </div>
               <div className="divide-y divide-stone-50 max-h-52 overflow-y-auto">
                 {queue.slice(0, 10).map((p:any, i:number) => (
-                  <div key={p.id} onClick={() => { if (phase === 'idle') { setQIdx(i) } }}
-                    className={`flex items-center gap-3 px-4 py-2.5 text-sm transition-all ${i === qIdx ? 'bg-saffron-50 border-l-4 border-saffron-500' : 'hover:bg-stone-50 cursor-pointer'}`}>
+                  <div key={p.id} 
+                    className={`flex items-center gap-3 px-4 py-2.5 text-sm transition-all ${i === qIdx ? 'bg-saffron-50 border-l-4 border-saffron-500' : 'hover:bg-stone-50'}`}>
+                    {/* Player Number - Click to start auction */}
+                    <button
+                      onClick={() => {
+                        if (phase === 'idle') {
+                          setQIdx(i)
+                          startPlayer(p)
+                        } else if (phase === 'bidding') {
+                          toast.error('Finish current auction first!')
+                        }
+                      }}
+                      className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-xs shrink-0 transition-all ${
+                        phase === 'idle' 
+                          ? 'bg-saffron-100 text-saffron-700 hover:bg-saffron-200 cursor-pointer border border-saffron-300' 
+                          : 'bg-stone-100 text-stone-400 cursor-not-allowed border border-stone-200'
+                      }`}
+                      disabled={phase !== 'idle'}
+                      title={phase === 'idle' ? `Click to start auction for ${p.name}` : 'Finish current auction first'}
+                    >
+                      {i + 1}
+                    </button>
                     <div className="w-8 h-8 rounded-full bg-stone-100 overflow-hidden flex items-center justify-center font-bold text-stone-500 text-xs shrink-0">
                       {p.photoURL ? <img src={p.photoURL} className="w-full h-full object-cover"/> : p.name?.[0]}
                     </div>
