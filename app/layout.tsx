@@ -7,7 +7,7 @@ export const metadata: Metadata = {
   title: "Player Auction Hub – India's Dedicated Digital Platform for Cricket Auctions",
   description: "Cricket Auction Hub is India’s most trusted digital platform designed specifically for cricket. We’ve removed the clutter of other sports to focus 100% on the gentleman's game. From local club leagues to massive corporate tournaments, manage your player bidding with professional-grade tools.",
   icons: {
-    icon: '/icon.png',
+    icon: '/logo.png',
   },
 }
 

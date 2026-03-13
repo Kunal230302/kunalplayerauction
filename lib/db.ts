@@ -74,7 +74,7 @@ export const addTournament = async (d: Omit<Tournament, 'id' | 'registeredPlayer
   const code = genCode()
   const docRef = await addDoc(collection(db, 'tournaments'), {
     ...d, registeredPlayers: 0, status: 'upcoming', code,
-    maxFreeTeams: d.isAdmin ? 9999 : 4, createdAt: serverTimestamp()
+    maxFreeTeams: d.isAdmin ? 9999 : 6, createdAt: serverTimestamp()
   })
   // Create default settings subcollection
   await setDoc(doc(db, 'tournaments', docRef.id, 'meta', 'settings'), {
@@ -254,6 +254,15 @@ export const markSold = async (playerId: string, teamId: string, teamName: strin
 export const markUnsold = async (playerId: string, tid?: string) => {
   await updatePlayer(playerId, { status: 'unsold' }, tid)
   await updateLive({ status: 'unsold' }, tid)
+}
+
+export const getAuctionResults = async (tournamentId?: string): Promise<any[]> => {
+  if (!tournamentId) {
+    const s = await getDocs(query(collection(db, 'auction_results'), orderBy('soldAt', 'desc')))
+    return s.docs.map(d => ({ id: d.id, ...d.data() }))
+  }
+  const s = await getDocs(query(collection(db, 'tournaments', tournamentId, 'auction_results'), orderBy('soldAt', 'desc')))
+  return s.docs.map(d => ({ id: d.id, ...d.data() }))
 }
 
 export const resetTournament = async (tid?: string) => {

@@ -3,10 +3,36 @@ export const dynamic = 'force-dynamic'
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { useParams } from 'next/navigation'
-import { getTournamentByCode, getTeams, getPlayers, addPlayer, Tournament, Team, Player, subPlayerCount } from '@/lib/db'
+import { getTournamentByCode, getTeams, getPlayers, addPlayer, Tournament, Team, Player, subPlayerCount, getSettings } from '@/lib/db'
 import { uploadToCloudinary } from '@/lib/cloudinary'
-import { FiUsers, FiShield, FiMapPin, FiZap, FiCopy, FiUpload, FiPlus, FiX, FiCamera } from 'react-icons/fi'
+import { FiUsers, FiShield, FiMapPin, FiZap, FiCopy, FiUpload, FiPlus, FiX, FiCamera, FiClock, FiEye } from 'react-icons/fi'
 import toast from 'react-hot-toast'
+
+/* ── Countdown timer ── */
+function Countdown({ target }: { target: string }) {
+  const [t, setT] = useState({ d: 0, h: 0, m: 0, s: 0, done: false })
+  useEffect(() => {
+    const tick = () => {
+      const ms = new Date(target).getTime() - Date.now()
+      if (ms <= 0) { setT(x => ({ ...x, done: true })); return }
+      setT({ d: Math.floor(ms / 86400000), h: Math.floor(ms % 86400000 / 3600000), m: Math.floor(ms % 3600000 / 60000), s: Math.floor(ms % 60000 / 1000), done: false })
+    }
+    tick(); const id = setInterval(tick, 1000); return () => clearInterval(id)
+  }, [target])
+  if (t.done) return <p className="text-saffron-200 font-bold text-lg tracking-wide">🏏 The Auction is LIVE now!</p>
+  return (
+    <div className="flex gap-2 sm:gap-3 justify-center">
+      {([['Days', t.d], ['Hrs', t.h], ['Min', t.m], ['Sec', t.s]] as [string, number][]).map(([l, v]) => (
+        <div key={l} className="text-center">
+          <div className="bg-white/10 backdrop-blur border border-white/20 rounded-xl sm:rounded-2xl px-3 sm:px-4 py-2 sm:py-3 min-w-[56px] sm:min-w-[68px]">
+            <div className="text-3xl sm:text-4xl font-extrabold tabular-nums leading-none">{String(v).padStart(2, '0')}</div>
+          </div>
+          <div className="text-saffron-200 text-[10px] sm:text-xs font-bold mt-1.5 tracking-widest uppercase">{l}</div>
+        </div>
+      ))}
+    </div>
+  )
+}
 
 // Device detection utility - Enhanced version with specific model detection
 const getDeviceInfo = () => {
@@ -176,6 +202,7 @@ export default function TournamentPage() {
   const params = useParams()
   const code = (params.code as string)?.toUpperCase()
   const [tournament, setTournament] = useState<Tournament | null>(null)
+  const [settings, setSettings] = useState<any>(null)
   const [teams, setTeams] = useState<Team[]>([])
   const [players, setPlayers] = useState<Player[]>([])
   const [livePlayerCount, setLivePlayerCount] = useState<number | null>(null)
@@ -187,19 +214,19 @@ export default function TournamentPage() {
   const [saving, setSaving] = useState(false)
   const [photo, setPhoto] = useState<File | null>(null)
   const [photoPreview, setPhotoPreview] = useState('')
-  const [paymentSS, setPaymentSS] = useState<File | null>(null)
-  const [paymentPreview, setPaymentPreview] = useState('')
   const [form, setForm] = useState({
     name: '', surname: '', mobile: '', dob: '', district: '', taluka: '', role: 'Batsman',
   })
+  const [mounted, setMounted] = useState(false)
+  useEffect(() => setMounted(true), [])
 
   const load = async () => {
     if (!code) return
     const t = await getTournamentByCode(code)
     if (!t) { setNotFound(true); setLoading(false); return }
     setTournament(t)
-    const [te, pl] = await Promise.all([getTeams(t.id), getPlayers(t.id)])
-    setTeams(te); setPlayers(pl)
+    const [te, pl, s] = await Promise.all([getTeams(t.id), getPlayers(t.id), getSettings(t.id)])
+    setTeams(te); setPlayers(pl); setSettings(s)
     setLoading(false)
   }
 
@@ -264,22 +291,17 @@ export default function TournamentPage() {
       if (photo) {
         photoURL = await uploadToCloudinary(photo, 'tournament-players')
       }
-      let paymentScreenshotURL = ''
-      if (paymentSS) {
-        paymentScreenshotURL = await uploadToCloudinary(paymentSS, 'tournament-payments')
-      }
       // Get device info
       const { deviceId, deviceName } = getDeviceInfo()
       
       await addPlayer({
         name: form.name.trim(), surname: form.surname.trim(), village: '', role: form.role,
         mobile: form.mobile.trim(), dob: form.dob, district: form.district, taluka: form.taluka,
-        photoURL, paymentScreenshotURL, deviceId, deviceName
+        photoURL, paymentScreenshotURL: '', deviceId, deviceName
       }, tournament.id)
       toast.success(`${form.name} ${form.surname} registered! 🏏`)
       setForm({ name: '', surname: '', mobile: '', dob: '', district: '', taluka: '', role: 'Batsman' })
-      setPhoto(null); setPhotoPreview(''); setPaymentSS(null); setPaymentPreview('')
-      setShowForm(false); load()
+      setPhoto(null); setPhotoPreview(''); setShowForm(false); load()
     } catch (e: any) { toast.error(e.message) }
     setSaving(false)
   }
@@ -288,7 +310,7 @@ export default function TournamentPage() {
     <div className="min-h-screen flex items-center justify-center bg-stone-50">
       <div className="text-center">
         <div className="w-16 h-16 rounded-3xl flex items-center justify-center overflow-hidden mx-auto mb-3 animate-bounce">
-          <img src="/icon.png" alt="Logo" className="w-full h-full object-contain" />
+          <img src="/logo.png" alt="Logo" className="w-full h-full object-contain" />
         </div>
         <p className="text-stone-400 font-medium">Loading tournament…</p>
       </div>
@@ -323,18 +345,28 @@ export default function TournamentPage() {
           <h1 className="text-3xl sm:text-4xl font-extrabold mb-2">{t.name}</h1>
           {t.description && <p className="text-saffron-100 text-sm mb-4 max-w-xl mx-auto">{t.description}</p>}
 
-          <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur border border-white/30 rounded-xl px-5 py-2 mb-6">
+          <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur border border-white/30 rounded-xl px-5 py-2 mb-6 shadow-sm">
             <span className="text-saffron-200 text-xs font-bold uppercase tracking-widest">Code:</span>
             <span className="text-2xl font-black tracking-widest">{code}</span>
             <button onClick={copyCode} className="p-1 hover:bg-white/20 rounded-lg transition"><FiCopy size={14} /></button>
           </div>
 
-          <div className="mb-6">
-            <span className={`px-4 py-1.5 rounded-full text-xs font-extrabold uppercase tracking-widest
+          <div className="mb-8">
+            <span className={`px-4 py-1.5 rounded-full text-xs font-extrabold uppercase tracking-widest shadow-sm
               ${t.status === 'live' ? 'bg-green-500' : t.status === 'ended' ? 'bg-stone-500' : 'bg-white/20'}`}>
               {t.status === 'live' ? '🔴 LIVE NOW' : t.status === 'ended' ? '✅ ENDED' : '🕐 UPCOMING'}
             </span>
           </div>
+
+          {settings?.auctionDate && t.status !== 'ended' && (
+            <div className="mb-10 animate-fade-in inline-block text-left bg-white/5 border border-white/10 p-5 sm:p-6 rounded-3xl shadow-2xl backdrop-blur-sm">
+              <div className="flex items-center justify-center gap-2 mb-4 text-saffron-100 font-medium">
+                <FiClock size={16} className="animate-pulse" />
+                <span>Auction starts strictly on <strong>{mounted ? new Date(settings.auctionDate).toLocaleString('en-IN', { dateStyle: 'long', timeStyle: 'short' }) : '...'}</strong></span>
+              </div>
+              <Countdown target={settings.auctionDate} />
+            </div>
+          )}
 
           <div className="grid grid-cols-3 gap-3 max-w-sm mx-auto">
             {[['👤', livePlayerCount ?? players.length, 'Players'], ['🏆', sold, 'Sold'], ['🛡️', teams.length, 'Teams']].map(([ic, v, l]) => (
@@ -362,15 +394,15 @@ export default function TournamentPage() {
             <div className="font-bold text-sm text-stone-700">Register Team</div>
             <div className="text-xs text-stone-400">Add new team</div>
           </Link>
+          <Link href={`/t/${code}/teams-display`} className="card p-4 text-center hover:shadow-lg hover:-translate-y-0.5 transition-all border-2 border-purple-100 hover:border-purple-300">
+            <FiEye className="mx-auto mb-1 text-purple-500" size={22} />
+            <div className="font-bold text-sm text-stone-700">View Teams</div>
+            <div className="text-xs text-stone-400">See registered teams</div>
+          </Link>
           <Link href={`/login`} className="card p-4 text-center hover:shadow-lg hover:-translate-y-0.5 transition-all border-2 border-saffron-100 hover:border-saffron-300">
             <FiZap className="mx-auto mb-1 text-saffron-500" size={22} />
             <div className="font-bold text-sm text-stone-700">Live Auction</div>
             <div className="text-xs text-stone-400">Admin login</div>
-          </Link>
-          <Link href="/" className="card p-4 text-center hover:shadow-lg hover:-translate-y-0.5 transition-all border-2 border-stone-100 hover:border-stone-300">
-            <span className="text-xl block mb-1">🏠</span>
-            <div className="font-bold text-sm text-stone-700">Home</div>
-            <div className="text-xs text-stone-400">Back to main</div>
           </Link>
         </div>
       </div>
@@ -478,41 +510,6 @@ export default function TournamentPage() {
                   ))}
                 </div>
               </div>
-
-              {/* ── Payment Section ── */}
-              {t.entryFee > 0 && (
-                <div className="border-t-2 border-stone-100 pt-5">
-                  <h4 className="font-extrabold text-base text-stone-800 mb-3">💰 Registration Fee: ₹{t.entryFee}</h4>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    {/* QR Code */}
-                    <div className="bg-gradient-to-br from-green-50 to-blue-50 border-2 border-green-200 rounded-2xl p-4 text-center">
-                      <p className="text-xs font-bold text-green-700 mb-2">📱 Scan to Pay via GPay / UPI</p>
-                      {t.upiQrURL ? (
-                        <img src={t.upiQrURL} alt="UPI QR Code" className="w-40 h-40 mx-auto rounded-xl border-2 border-green-100 object-contain bg-white p-1" />
-                      ) : (
-                        <div className="w-40 h-40 mx-auto rounded-xl border-2 border-green-100 bg-white flex items-center justify-center"><span className="text-stone-300 text-sm">QR not uploaded</span></div>
-                      )}
-                      <p className="text-xs text-green-600 font-semibold mt-2">Entry Fee: ₹{t.entryFee} • Upload screenshot if paid (optional)</p>
-                    </div>
-                    {/* Upload payment screenshot */}
-                    <div className="flex flex-col justify-center">
-                      <label className="label mb-2">📸 Upload Payment Screenshot (optional)</label>
-                      <div onClick={() => document.getElementById('paymentSS')?.click()}
-                        className={`border-2 border-dashed rounded-2xl p-4 text-center cursor-pointer transition-all hover:bg-green-50
-                          ${paymentPreview ? 'border-green-400 bg-green-50' : 'border-stone-300'}`}>
-                        {paymentPreview ? (
-                          <div><img src={paymentPreview} className="w-full max-h-32 object-contain rounded-lg mx-auto" /><p className="text-xs text-green-600 font-bold mt-2">✅ Screenshot uploaded</p></div>
-                        ) : (
-                          <><FiUpload className="mx-auto text-stone-400 mb-1"/><p className="text-xs text-stone-400">Upload payment screenshot (optional)</p></>
-                        )}
-                      </div>
-                      <input id="paymentSS" type="file" accept="image/*" className="hidden" onChange={e => {
-                        const f = e.target.files?.[0]; if (f) { setPaymentSS(f); setPaymentPreview(URL.createObjectURL(f)) }
-                      }} />
-                    </div>
-                  </div>
-                </div>
-              )}
 
               {/* Submit */}
               <button onClick={handleRegister} disabled={saving}

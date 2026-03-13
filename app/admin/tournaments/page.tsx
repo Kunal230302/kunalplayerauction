@@ -17,10 +17,12 @@ const BLANK: {
   totalPlayersRequired: number; registeredPlayers: number; ballType: string
   groundName: string; groundLocation: string; auctionLocation: string
   status: 'upcoming' | 'live' | 'ended'
+  auctionDate: string
 } = {
   name: '', description: '', logoURL: '', entryFee: 0,
   totalPlayersRequired: 0, registeredPlayers: 0, ballType: 'Tennis Ball',
   groundName: '', groundLocation: '', auctionLocation: '', status: 'upcoming',
+  auctionDate: ''
 }
 
 export default function TournamentsPage() {
@@ -349,10 +351,19 @@ export default function TournamentsPage() {
                 </div>
               </div>
 
-              {/* Auction location (optional) */}
+              {/* Auction location & Date (optional) */}
               <div className="border-t border-stone-100 pt-4">
-                <p className="text-xs font-bold text-stone-400 uppercase tracking-wider mb-3">🏏 Auction Location <span className="text-stone-300">(Optional)</span></p>
-                <input className="input" placeholder="e.g. Hotel Patil, Unjha" value={form.auctionLocation} onChange={e => F('auctionLocation', e.target.value)}/>
+                <p className="text-xs font-bold text-stone-400 uppercase tracking-wider mb-3">🏏 Auction Details <span className="text-stone-300">(Optional)</span></p>
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="label">Auction Location</label>
+                    <input className="input" placeholder="e.g. Hotel Patil, Unjha" value={form.auctionLocation} onChange={e => F('auctionLocation', e.target.value)}/>
+                  </div>
+                  <div>
+                    <label className="label">Auction Date & Time</label>
+                    <input className="input" type="datetime-local" value={form.auctionDate || ''} onChange={e => F('auctionDate', e.target.value)}/>
+                  </div>
+                </div>
               </div>
             </div>
             <div className="flex gap-3 px-6 pb-6">

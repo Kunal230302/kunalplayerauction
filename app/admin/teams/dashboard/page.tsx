@@ -5,7 +5,8 @@ import AdminLayout from '@/components/admin/AdminLayout'
 import { db } from '@/lib/firebase'
 import { collection, addDoc, getDocs, deleteDoc, doc, updateDoc, serverTimestamp, query, where } from 'firebase/firestore'
 import { uploadToCloudinary } from '@/lib/cloudinary'
-import { FiPlus, FiEdit2, FiTrash2, FiSearch, FiX, FiUpload, FiCopy, FiExternalLink } from 'react-icons/fi'
+import { FiPlus, FiEdit2, FiTrash2, FiSearch, FiX, FiUpload, FiCopy, FiExternalLink, FiPrinter } from 'react-icons/fi'
+import Link from 'next/link'
 import toast from 'react-hot-toast'
 import { addTeam } from '@/lib/db'
 
@@ -153,7 +154,12 @@ export default function AdminTeamsPage() {
             <h1 className="page-title">Team Management</h1>
             <p className="text-stone-400 text-sm">{teams.length} teams · Admin can add unlimited teams</p>
           </div>
-          <button onClick={openAdd} className="btn-primary gap-2"><FiPlus size={16}/> Add Team</button>
+          <div className="flex gap-2">
+            <Link href={`/admin/teams/sheets?tournamentId=${selectedTournament || 'global'}`} className="btn-outline gap-2 bg-white flex items-center px-4 py-2 rounded-lg text-sm font-medium">
+              <FiPrinter size={16}/> Print Sheets
+            </Link>
+            <button onClick={openAdd} className="btn-primary gap-2"><FiPlus size={16}/> Add Team</button>
+          </div>
         </div>
 
         {/* Tournament Selector */}

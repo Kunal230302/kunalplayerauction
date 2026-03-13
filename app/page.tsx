@@ -153,24 +153,17 @@ export default function Home() {
 
           <div className="h-20 sm:h-32 md:h-40"></div> {/* Reduced spacer */}
 
-          <p className="max-w-3xl mx-auto text-stone-900 text-base sm:text-lg mb-10 leading-relaxed font-bold drop-shadow-sm">
-            Cricket Auction Hub is India’s most trusted digital platform designed specifically for cricket.
-            We’ve removed the clutter of other sports to focus 100% on the gentleman's game.
+          <p className="max-w-3xl mx-auto text-black text-base sm:text-lg mb-10 leading-relaxed font-medium drop-shadow-md">
+            Cricket Auction Hub is India's most trusted digital platform designed specifically for cricket.
+            We've removed the clutter of other sports to focus 100% on the gentleman's game.
             From local club leagues to massive corporate tournaments, manage your player bidding with professional-grade tools.
           </p>
 
-          {settings.auctionDate && (
-            <p className="text-stone-900 text-sm font-black mb-8 tracking-wide">
-              📅 {new Date(settings.auctionDate).toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
-            </p>
-          )}
-
-          {settings.auctionDate && (
-            <div className="mb-10">
-              <p className="text-stone-900 text-xs font-black tracking-widest uppercase mb-4">⏱ Auction Begins In</p>
-              <Countdown target={settings.auctionDate} />
-            </div>
-          )}
+          <p className="max-w-3xl mx-auto text-black text-base sm:text-lg mb-10 leading-relaxed font-medium drop-shadow-md">
+            Cricket Auction Hub is India's most trusted digital platform designed specifically for cricket.
+            We've removed the clutter of other sports to focus 100% on the gentleman's game.
+            From local club leagues to massive corporate tournaments, manage your player bidding with professional-grade tools.
+          </p>
 
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
             <Link href="/login" onClick={gavel.trigger}
@@ -281,6 +274,26 @@ export default function Home() {
                             <div className="text-[11px] text-purple-500">Auction Location</div>
                             <div className="text-xs font-bold text-purple-700">{t.auctionLocation}</div>
                           </div>
+                        </div>
+                      )}
+
+                      {/* Auction Timer - Debug */}
+                      {t.auctionDate ? (
+                        <div className="bg-green-50 rounded-xl p-3 mb-3 border border-green-200">
+                          <p className="text-green-700 text-xs font-bold mb-2 text-center">⏱ AUCTION TIMER</p>
+                          <Countdown target={t.auctionDate} />
+                        </div>
+                      ) : (
+                        <div className="bg-yellow-50 rounded-xl p-3 mb-3 border border-yellow-200">
+                          <p className="text-yellow-700 text-xs font-bold text-center">⚠️ No Auction Date Set</p>
+                        </div>
+                      )}
+
+                      {/* Auction Timer */}
+                      {t.status === 'live' && t.auctionDate && (
+                        <div className="bg-green-50 rounded-xl p-3 mb-3 border border-green-200">
+                          <p className="text-green-700 text-xs font-bold mb-2 text-center">⏱ AUCTION TIMER</p>
+                          <Countdown target={t.auctionDate} />
                         </div>
                       )}
 

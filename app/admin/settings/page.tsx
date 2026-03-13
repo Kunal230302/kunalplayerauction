@@ -132,7 +132,7 @@ export default function SettingsPage() {
 
           {/* Tier 2 */}
           <div className="bg-orange-50 border border-orange-200 rounded-xl p-4 space-y-3">
-            <p className="text-xs font-bold text-orange-700">🟠 Tier 2 — Mid Bids</p>
+            <p className="text-xs font-bold text-orange-700">🟠 Tier 2 — High Bids</p>
             <div className="grid grid-cols-2 gap-3">
               <div>
                 <label className="label text-xs">Up to Amount (₹)</label>
@@ -150,21 +150,11 @@ export default function SettingsPage() {
             </p>
           </div>
 
-          {/* Tier 3 (above tier 2 limit) */}
-          <div className="bg-red-50 border border-red-200 rounded-xl p-4">
-            <p className="text-xs font-bold text-red-700">🔴 Tier 3 — High Bids (Auto)</p>
-            <p className="text-xs text-red-600 font-semibold mt-1">
-              👉 Above {fmt(form.bidTier2Limit)} → each bid = +{fmt(form.bidTier2Inc * 2)}
-            </p>
-            <p className="text-xs text-stone-400 mt-1">Automatically 2× Tier 2 increment</p>
-          </div>
-
           {/* Visual summary */}
           <div className="bg-saffron-50 border border-saffron-200 rounded-xl p-4 space-y-1 text-sm text-saffron-700 font-semibold">
             <div>⏱️ Timer: {form.timerSeconds} sec per bid</div>
             <div>🏏 Base: {fmt(form.basePrice)} → {fmt(form.bidTier1Limit)}: +{fmt(form.bidTier1Inc)}/bid</div>
             <div>📈 {fmt(form.bidTier1Limit)} → {fmt(form.bidTier2Limit)}: +{fmt(form.bidTier2Inc)}/bid</div>
-            <div>🚀 Above {fmt(form.bidTier2Limit)}: +{fmt(form.bidTier2Inc * 2)}/bid</div>
           </div>
         </div>
 

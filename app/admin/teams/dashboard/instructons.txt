@@ -1,0 +1,7 @@
+after auction done which player sold in this do that also with points and make pdf after auction add section after auction pdf
+
+
+
+team ka name likho not team name 
+ex registered team kattar hindu replace team 1 with kattar hindu 
+aur jitni team registred huva hai itni hi pages print karo
